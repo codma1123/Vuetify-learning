@@ -1,4 +1,5 @@
-<template>
+<template>  
+  <div ref="focusElement"></div>
   <v-autocomplete
     v-model="search"             
     label="소환사명"
@@ -27,7 +28,7 @@
 </template>
 
 <script>
-import { onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 export default {
@@ -36,20 +37,26 @@ export default {
 
       const search = ref('')
       const autoCompleteItems = ref([])
+      const focusElement = ref(null)
 
       function searchContent(payload) {
+        search.value = ''        
         router.push(`/summoner/${payload}`)
-        nextTick(() => search.value = '')      
+        
+        nextTick(() => focusElement.value.blur())
       }
       
-      onMounted(() => autoCompleteItems.value = Object.keys(window.localStorage).map(content => ({
-        name: content,
-        bookmarked: false,
-      })))
+      onMounted(() => {
+          autoCompleteItems.value = Object.keys(window.localStorage).map(content => ({
+          name: content,
+          bookmarked: false,
+        }))
+      })
 
       return {
         search,
         autoCompleteItems,
+        focusElement,
         searchContent,
         blurAutoComplate: () => search.value = '',
         listItemClick: e => searchContent(e),
