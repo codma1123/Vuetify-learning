@@ -1,0 +1,4 @@
+export const contentSize = {
+  MAIN_CONTENT_SHEET_SIZE: 1200,
+  AYALYSIS_FILTER_GROUP_HEIGHT: 50,
+}

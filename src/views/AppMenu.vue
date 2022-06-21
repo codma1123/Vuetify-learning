@@ -4,29 +4,33 @@
     elevation="0"
     :height="appMenuHeight + 10"
   >      
-    <v-row>
-      <v-tabs 
-        fixed-tabs
-        class="tabs"
-        v-model="tab"                
-        background-color="primary"        
-      >
-        <v-tab          
-          v-for="(menu, i) in tabMenus"
-          :key="i"
-          :to="menu.path"
-          exact
+    <v-row justify="center">
+      <v-sheet :width="contentSize.MAIN_CONTENT_SHEET_SIZE" color="secondary">        
+        <v-tabs 
+          class="tabs"
+          v-model="tab"                
+          background-color="primary"        
         >
-          {{ menu.name }}
-        </v-tab>
-      </v-tabs>
+          <v-tab          
+            v-for="(menu, i) in tabMenus"
+            :key="i"
+            :to="menu.path"
+            exact
+          >
+            {{ menu.name }}
+          </v-tab>
+        </v-tabs>
+      </v-sheet>
     </v-row>
 
     <v-card
+      class="search"
       :height="appMenuHeight"
       width="300"
       color="white"        
       v-if="!searchBar"
+      right
+      position="fixed"      
     >
       <search-bar/>
     </v-card>
@@ -38,6 +42,7 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import SearchBar from '../components/SearchBar.vue'
+import { contentSize } from '../tools/divice'
 
 export default {
   components: {
@@ -76,6 +81,7 @@ export default {
       appMenuHeight,
       tab,      
       searchBar,
+      contentSize
     }
   }
 }
@@ -83,6 +89,10 @@ export default {
 
 <style>
 .tabs {
-  margin-left:100px;
+  
+}
+
+.search {
+  right: 13px; 
 }
 </style>
