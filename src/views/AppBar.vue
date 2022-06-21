@@ -37,7 +37,7 @@ export default {
     const theme = useTheme()
     const router = useRouter()
 
-    const appBarTitle = '오승딱스'
+    const appBarTitle = '오승딱.GG'
     const appBarHeight = 40
     const themeIcon = 'mdi-theme-light-dark'
         

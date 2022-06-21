@@ -9,14 +9,22 @@
 </template>
 
 <script>
+import { onMounted } from 'vue'
+import { useSearchStore } from './store'
 import AppBar from './views/AppBar.vue'
 import AppMenu from './views/AppMenu.vue'
+
 export default {
   name: 'App',
   components: {
     AppBar,
     AppMenu
+  },
+  setup() {
+    const searchStore = useSearchStore()
+    onMounted(() => searchStore.setupUserIconCDN())
   }
+
 }
 </script>
 

@@ -69,16 +69,9 @@
         height="1000"
         width="880"
       >    
-        <v-data-table>
-          ㅇㅇ
-        </v-data-table>
+        
       </v-card>
-
-
-
     </v-row>
-
-
   </v-sheet>  
 </template>
 
