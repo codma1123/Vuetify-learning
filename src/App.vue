@@ -3,13 +3,15 @@
     <v-main>      
       <app-bar />
       <app-menu />
+      
       <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useSearchStore } from './store'
 import AppBar from './views/AppBar.vue'
 import AppMenu from './views/AppMenu.vue'

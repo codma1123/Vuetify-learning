@@ -24,8 +24,14 @@ const routes = [
   {
     path: "/summoner/:name",
     name: "summoner",
-    component: () => import('../views/SummonerView.vue')
-  }
+    component: () => import('../views/SummonerView.vue'),
+    children: [
+      {
+        path: "champions",
+        components: () => import('../components/SummonerChampions.vue')
+      }
+    ]
+  },
 ]
 
 const router = createRouter({
