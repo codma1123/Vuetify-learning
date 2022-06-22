@@ -5,6 +5,10 @@ import 'vuetify/styles'
 // Vuetify
 import { createVuetify } from 'vuetify'
 import headSvg from '/icon-champion.svg'
+
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+
 const myCustomDarkTheme = {
   dark: true,
   colors: {
@@ -23,6 +27,8 @@ const myCustomLightTheme = {
 }
 
 export default createVuetify({
+    components,
+    directives,
     theme: {
       defaultTheme: 'myCustomDarkTheme',
       themes: {

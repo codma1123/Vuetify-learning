@@ -38,7 +38,6 @@ export const useSearchStore = defineStore('search', {
       // get league entries in all queues for a given summoner ID
       const leagueRes = await axios.get(`${config.baseUrl}/lol/league/v4/entries/by-summoner/${id}?api_key=${API_KEY}`)
       const { queueType, rank, tier, leaguePoints } = leagueRes.data[0]
-
       
       const start = 0
       const count = 5
@@ -50,6 +49,7 @@ export const useSearchStore = defineStore('search', {
       // })
 
       // console.log(this.matches)
+      console.log(leagueRes.data)
     
       "https://asia.api.riotgames.com/lol/match/v5/matches/KR_5973078693?api_key=RGAPI-8f7f4b4d-c57e-412c-b636-820239b0b60f"
 
@@ -61,7 +61,9 @@ export const useSearchStore = defineStore('search', {
         rank, 
         tier, 
         leaguePoints,
-        profileIconId,        
+        profileIconId,
+        tiers: [],
+        bookmarked: false
       }      
       this.iconUrl = `https://ddragon.leagueoflegends.com/cdn/${this.iconCdnVersion}/img/profileicon/${profileIconId}.png`     
       this.userInfoLoaded = false

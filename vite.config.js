@@ -8,8 +8,20 @@ import vuetify from 'vite-plugin-vuetify'
 export default defineConfig({
   plugins: [
 		vue(),
-		vuetify({ 
-			autoImport: true,
-		}),				
+		vuetify(
+			{ 
+				autoImport: true,				
+			}
+		),				
 	],	
+	css: {
+		preprocessorOptions: {
+			scss: {
+				additionalData: [
+					'@import "./src/styles/variables.scss";',					
+					'',
+				].join('\n')
+			}
+		}
+	}
 })
