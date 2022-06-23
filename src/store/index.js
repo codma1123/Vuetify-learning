@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-a9afd404-fb03-4b66-8148-60201c4b196c'
+const API_KEY = 'RGAPI-c8e8994a-20a9-45fb-8922-a1107add8cc3'
 
 const HEADER = {
   headers: {
@@ -44,7 +44,7 @@ export const useSearchStore = defineStore('search', {
       if (queueType === 'RANKED_SOLO_5x5') this.isRankGame = true
       
       const start = 0
-      const count = 1
+      const count = 3
       const matchListRes = await axios.get(`${config.asiaUrl}/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}&api_key=${API_KEY}`)      
       const matchIdUrls = matchListRes.data.map(matchId => `${config.asiaUrl}/lol/match/v5/matches/${matchId}?api_key=${API_KEY}`)
       
