@@ -95,7 +95,7 @@
     v-if="!searchStore.userInfoLoaded"
   >
     <v-sheet                                
-      :width="contentSize.MAIN_CONTENT_SHE"              
+      :width="contentSize.MAIN_CONTENT_SHEET_SIZE"              
       color="subcontent"                
       class="d-flex justify-start align-center ml-7"      
     >
