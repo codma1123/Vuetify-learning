@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { onMounted } from 'vue-demi'
+import { onMounted } from 'vue'
 
 export default {  
   setup() {

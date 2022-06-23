@@ -22,13 +22,13 @@ const routes = [
     component: () => import("../views/RankView.vue")
   },
   {
-    path: "/summoner/:name",
-    name: "summoner",
+    path: "/summoner/:name",    
     component: () => import('../views/SummonerView.vue'),
     children: [
       {
         path: "champions",
-        components: () => import('../components/SummonerChampions.vue')
+        // champion: () => import('../components/SummonerChampions.vue'),
+        component: () => import('../components/SummonerChampions.vue')
       }
     ]
   },

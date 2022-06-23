@@ -124,9 +124,7 @@
   </v-sheet>
 
   <!-- ContentArea -->
-  <router-view>
-    <summoner-champions />
-  </router-view>
+  <router-view></router-view>
 
 </template>
 
