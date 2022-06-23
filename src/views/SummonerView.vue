@@ -105,8 +105,8 @@
         rounded="md"
         v-for="(button, i) in viewSelectToggleButtons"
         elevation="0"
-        :color="button.activate ? '#515163' : 'subcontent'"          
-        @click="selectView(button.path)" 
+        :color="button.activate ? '#515163' : 'subcontent'"   
+        @click="selectView(button.path, i)" 
         exact
         :key="i"
       >
@@ -129,10 +129,10 @@
 </template>
 
 <script>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useSearchStore } from '../store'
-import { contentSize } from '../tools/divice'
+import { computed, onMounted, onUpdated, ref, watch } from 'vue'
+import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router'
+import useSizeSetup from '@/tools/SizeSetup.vue'
+
 import SummonerChampions from '../components/SummonerChampions.vue'
 
 export default {
@@ -142,7 +142,9 @@ export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
-    const searchStore = useSearchStore()
+    
+    const { searchStore, contentSize } = useSizeSetup()
+    
     const summonerName = ref('')
     const viewSelectToggleModel = ref(0)
     const bookmarkStyle = ref({
@@ -164,15 +166,18 @@ export default {
           activate: false,
           path: `/summoner/${summonerName.value}/champions`
         },      
-      ]
-      if(!searchStore.loadComplate) searchStore.searchContent(route.params.name)      
+      ]           
     })
-    
+
+    onUpdated(() => {
+      summonerName.value = route.params.name
+    })
+      
     const bookmarkedIcon = computed(() => 
       searchStore.user.bookmarked ? 'mdi-star' : 'mdi-star-outline'
     )
 
-    function iconClick() {
+    function iconClick(i) {
       searchStore.user.bookmarked = !searchStore.user.bookmarked
       bookmarkStyle.value = searchStore.user.bookmarked 
         ? {
@@ -183,10 +188,15 @@ export default {
         : {
           background: 'none',
           starColor: '#595D67'
-        }
+        }      
+
     }
 
-    function selectView(path) {      
+    function selectView(path, i) {      
+      if(!viewSelectToggleButtons.value[i].activate) {
+        viewSelectToggleButtons.value[0].activate = !viewSelectToggleButtons.value[0].activate
+        viewSelectToggleButtons.value[1].activate = !viewSelectToggleButtons.value[1].activate
+      }
       router.push(path)
     }
 

@@ -42,7 +42,8 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import SearchBar from '../components/SearchBar.vue'
-import { contentSize } from '../tools/divice'
+
+import useSizeSetup from '@/tools/SizeSetup.vue'
 
 export default {
   components: {
@@ -51,6 +52,8 @@ export default {
 
   setup() {
     const route = useRoute()
+    const { contentSize } = useSizeSetup()
+
 
     const tab = ref(null)
     const appMenuHeight = 50

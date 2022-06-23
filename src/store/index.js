@@ -20,19 +20,18 @@ const config = {
 
 export const useSearchStore = defineStore('search', {
   state: () => ({ 
-    user: {
-
-    },
+    user: {},
     matches: [],
     userInfoLoaded: false,
     loadComplate: false,
     iconCdnVersion: '',
-    iconUrl: ''
+    iconUrl: '',
+    isRankGame: false
    }),  
   actions: {
-    async searchContent(name) {      
-
+    async searchContent(name) {            
       this.userInfoLoaded = true
+      this.isRankGame = false
       
       //
       const idRes = await axios.get(`${config.baseUrl}/lol/summoner/v4/summoners/by-name/${name}?api_key=${API_KEY}`)
@@ -40,7 +39,9 @@ export const useSearchStore = defineStore('search', {
 
       // get league entries in all queues for a given summoner ID
       const leagueRes = await axios.get(`${config.baseUrl}/lol/league/v4/entries/by-summoner/${id}?api_key=${API_KEY}`)
-      const { queueType, rank, tier, leaguePoints } = leagueRes.data[0]
+      const { queueType, rank, tier, leaguePoints, wins, losses } = leagueRes.data[0]
+      console.log(queueType)
+      if (queueType === 'RANKED_SOLO_5x5') this.isRankGame = true
       
       const start = 0
       const count = 1
@@ -66,8 +67,9 @@ export const useSearchStore = defineStore('search', {
         })
       })
 
-      // console.log(this.matches)
       console.log(this.matches)
+      console.log(leagueRes.data[0])
+
     
       "https://asia.api.riotgames.com/lol/match/v5/matches/KR_5973078693?api_key=RGAPI-8f7f4b4d-c57e-412c-b636-820239b0b60f"
 
@@ -76,9 +78,13 @@ export const useSearchStore = defineStore('search', {
       this.user = { 
         summonerLevel,
         queueType, 
+
         rank, 
         tier, 
+        wins,
+        losses,
         leaguePoints,
+
         profileIconId,
         tiers: [],
         bookmarked: false
@@ -86,6 +92,8 @@ export const useSearchStore = defineStore('search', {
       this.iconUrl = `${config.imgUrl}/${this.iconCdnVersion}/img/profileicon/${profileIconId}.png`     
       this.userInfoLoaded = false
       this.loadComplate = true
+
+      console.log(this.user)
     },
 
     async setupUserIconCDN() {

@@ -23,12 +23,19 @@ const routes = [
   },
   {
     path: "/summoner/:name",    
-    component: () => import('../views/SummonerView.vue'),
+    component: () => import('../views/SummonerView.vue'),    
+    beforeEnter: (to, from, next) => {
+      console.log('enter..')
+      next()
+    },    
     children: [
       {
-        path: "champions",
-        // champion: () => import('../components/SummonerChampions.vue'),
+        path: "champions",        
         component: () => import('../components/SummonerChampions.vue')
+      },
+      {
+        path: '',
+        component: () => import('../components/SummonerTotal.vue'),        
       }
     ]
   },

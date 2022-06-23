@@ -29,19 +29,23 @@
 
 <script>
 import { nextTick, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteUpdate, useRoute } from 'vue-router'
+import useSizeSetup from '@/tools/SizeSetup.vue'
 
 export default {
     setup() {
-      const router = useRouter()
-
+      const router = useRouter()      
+      const { searchStore } = useSizeSetup()      
       const search = ref('')
       const autoCompleteItems = ref([])
       const focusElement = ref(null)
-
+      
       function searchContent(payload) {
-        search.value = ''        
+
+        search.value = ''    
+        searchStore.user = {}
         router.push(`/summoner/${payload}`)
+        searchStore.searchContent(payload)
         
         nextTick(() => focusElement.value.blur())
       }
@@ -52,6 +56,8 @@ export default {
           bookmarked: false,
         }))
       })
+
+      
 
       return {
         search,

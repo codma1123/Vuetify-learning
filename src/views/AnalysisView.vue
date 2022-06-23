@@ -78,11 +78,11 @@
 <script>
 import { onMounted, computed, ref } from 'vue'
 import { useDisplay } from 'vuetify'
-import { contentSize } from '../tools/divice'
 
 
 import ChampSearchBar from '../components/ChampSearchBar.vue'
 import ChampList from '../components/ChampList.vue'
+import useSizeSetup from '@/tools/SizeSetup.vue'
 
 
 export default {
@@ -90,10 +90,9 @@ export default {
     ChampSearchBar,
     ChampList
   },
-  setup() {
-
+  setup() {    
     const { name, mobile } = useDisplay()
-
+    const { contentSize } = useSizeSetup()
     const searchContentAreaHeight = computed(() => {
       switch (name.value) {
         case 'xs':
