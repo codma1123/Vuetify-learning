@@ -40,7 +40,7 @@ export const useSearchStore = defineStore('search', {
       // get league entries in all queues for a given summoner ID
       const leagueRes = await axios.get(`${config.baseUrl}/lol/league/v4/entries/by-summoner/${id}?api_key=${API_KEY}`)
       const { queueType, rank, tier, leaguePoints, wins, losses } = leagueRes.data[0]
-      console.log(queueType)
+
       if (queueType === 'RANKED_SOLO_5x5') this.isRankGame = true
       
       const start = 0
@@ -50,7 +50,7 @@ export const useSearchStore = defineStore('search', {
       
       await axios.all(matchIdUrls.map(match => axios.get(match))).then(reses => {
         this.matches = reses.map(res => {
-          const { gameMode, participants } = res.data.info
+          const { gameMode, participants, gameDuration, gameEndTimestamp, teams } = res.data.info
 
           const enemyInfo = participants.map(participant => {
             const { championName, championId } = participant
@@ -63,14 +63,15 @@ export const useSearchStore = defineStore('search', {
             return { championName, championId, itemsUrls }
           })
 
-          return { gameMode, enemyInfo }
+          return { 
+            gameMode,
+            enemyInfo, 
+            gameDuration,  
+            win: teams[1].win
+          }
         })
       })
 
-      console.log(this.matches)
-      console.log(leagueRes.data[0])
-
-    
       "https://asia.api.riotgames.com/lol/match/v5/matches/KR_5973078693?api_key=RGAPI-8f7f4b4d-c57e-412c-b636-820239b0b60f"
 
       "https://asia.api.riotgames.com/lol/match/v5/matches/KR_5973078693?api_key=RGAPI-8f7f4b4d-c57e-412c-b636-820239b0b60f"
@@ -90,10 +91,12 @@ export const useSearchStore = defineStore('search', {
         bookmarked: false
       }      
       this.iconUrl = `${config.imgUrl}/${this.iconCdnVersion}/img/profileicon/${profileIconId}.png`     
+
+
+      // done phase
       this.userInfoLoaded = false
       this.loadComplate = true
 
-      console.log(this.user)
     },
 
     async setupUserIconCDN() {

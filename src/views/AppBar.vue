@@ -7,7 +7,7 @@
     <v-row>
       <v-sheet               
         color="primary"             
-        :height="appBarHeight" width="100" class="d-flex justify-center align-center">
+        :height="appBarHeight" width="100" class="d-flex justify-center align-center sunddak">
         <span class="font-weight-bold">{{ appBarTitle }}</span>
       </v-sheet>      
     </v-row>
@@ -55,5 +55,7 @@ export default {
 </script>
 
 <style>
-
+.sunddak {
+  margin-left: -3px;
+}
 </style>

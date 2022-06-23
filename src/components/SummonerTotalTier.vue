@@ -1,7 +1,8 @@
 <template>  
-  <v-sheet 
-    rounded="md"
-    class="mt-2 d-flex align-center justify-space-between" 
+
+  <!-- RankType -->
+  <v-sheet     
+    class="mt-2 d-flex align-center justify-space-between rank-type" 
     color="subcontent"
     :width="contentSize.SUMMONER_TOTAL_TIER_WIDTH"
     min-height="35"
@@ -19,11 +20,12 @@
       class="mr-2"
     > UnRanked      
     </span>
-
   </v-sheet>
+
+  <!-- RankDetailInfomation -->
   <v-sheet
-    color="subcontent"
-    class="rank-more justify-space-between"
+    color="subcontent "
+    class="rank-more justify-space-between rank-info"
     :width="contentSize.SUMMONER_TOTAL_TIER_WIDTH"
     :height="contentSize.SUMMONER_TOTAL_TIER_MORE_HEIGHT"
     v-if="searchStore.isRankGame"
@@ -101,6 +103,16 @@ export default {
   align-items: center;
   text-align: start;
   display: flex;  
+}
+
+.rank-type {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+.rank-info {
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
 </style>

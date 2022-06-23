@@ -10,7 +10,7 @@
       color="#121212"
       v-if="!searchStore.userInfoLoaded"
     >      
-      <v-row>
+      <v-row justify="start">
         <v-col>
           <summoner-total-tier title="솔로랭크"/>      
           <summoner-total-tier-champions />
