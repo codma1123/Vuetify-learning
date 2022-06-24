@@ -1,7 +1,14 @@
 import { defineStore } from 'pinia'
+import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
 
 const API_KEY = 'RGAPI-c8e8994a-20a9-45fb-8922-a1107add8cc3'
+const API_KEYS = [
+  'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
+  'RGAPI-8d145ff2-f5f3-43ad-9e38-0232dc06690f'
+]
+
+const REQUEST_COUNT = 6
 
 const HEADER = {
   headers: {
@@ -10,12 +17,6 @@ const HEADER = {
     'Access-control-Allow-Methods' : 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers' : "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method"      
   }
-}
-
-const config = {
-  baseUrl: 'https://kr.api.riotgames.com',
-  asiaUrl: 'https://asia.api.riotgames.com',
-  imgUrl: 'https://ddragon.leagueoflegends.com/cdn'
 }
 
 export const useSearchStore = defineStore('search', {
@@ -32,42 +33,54 @@ export const useSearchStore = defineStore('search', {
     async searchContent(name) {            
       this.userInfoLoaded = true
       this.isRankGame = false
-      
+            
       //
-      const idRes = await axios.get(`${config.baseUrl}/lol/summoner/v4/summoners/by-name/${name}?api_key=${API_KEY}`)
+      const idRes = await axios.get(`${urlConfig.baseUrl}/lol/summoner/v4/summoners/by-name/${name}?api_key=${API_KEY}`)
       const { accountId, summonerLevel, profileIconId, id, revisionDate, puuid } = idRes.data
 
       // get league entries in all queues for a given summoner ID
-      const leagueRes = await axios.get(`${config.baseUrl}/lol/league/v4/entries/by-summoner/${id}?api_key=${API_KEY}`)
+      const leagueRes = await axios.get(`${urlConfig.baseUrl}/lol/league/v4/entries/by-summoner/${id}?api_key=${API_KEY}`)
       const { queueType, rank, tier, leaguePoints, wins, losses } = leagueRes.data[0]
-
+      
       if (queueType === 'RANKED_SOLO_5x5') this.isRankGame = true
       
       const start = 0
-      const count = 3
-      const matchListRes = await axios.get(`${config.asiaUrl}/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}&api_key=${API_KEY}`)      
-      const matchIdUrls = matchListRes.data.map(matchId => `${config.asiaUrl}/lol/match/v5/matches/${matchId}?api_key=${API_KEY}`)
+      const count = REQUEST_COUNT
+      const matchListRes = await axios.get(`${urlConfig.asiaUrl}/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}&api_key=${API_KEY}`)      
+      const matchIdUrls = matchListRes.data.map(matchId => `${urlConfig.asiaUrl}/lol/match/v5/matches/${matchId}?api_key=${API_KEY}`)
       
       await axios.all(matchIdUrls.map(match => axios.get(match))).then(reses => {
         this.matches = reses.map(res => {
-          const { gameMode, participants, gameDuration, gameEndTimestamp, teams } = res.data.info
+          const { gameMode, participants, gameDuration, gameEndTimestamp, teams } = res.data.info          
 
-          const enemyInfo = participants.map(participant => {
+
+          // owner
+          const owner = participants.find(participant => participant.summonerName === name)
+          const { championName, championId, champLevel, kills, assists, deaths, totalMinionsKilled: cs,
+            largestMultikill, summoner1Id, summoner2Id
+           } = owner
+          console.log(owner)
+          owner.itemUrls = Array.from({length: 7}).map((_, i) => owner[`item${i}`])
+
+          const { win } = teams.find(team => team.teamId === owner.teamId)
+                    
+          const matchEntries = participants.map(participant => {
             const { championName, championId } = participant
-
-            const itemsUrls = Array.from({length: 7})
-                                .map((_, i) => {
-                                  const itemId = participant[`item${i}`]
-                                  return `${config.imgUrl}/${this.iconCdnVersion}/img/item/${itemId}`
-                                })                                                                    
+            const itemsUrls = Array.from({length: 7}).map((_, i) => {
+                                      const itemId = participant[`item${i}`]
+                                      return `${urlConfig.imgUrl}/${this.iconCdnVersion}/img/item/${itemId}`
+                                    })                                                                                                                                                     
             return { championName, championId, itemsUrls }
           })
-
+          
           return { 
+            win,                 
             gameMode,
-            enemyInfo, 
             gameDuration,  
-            win: teams[1].win
+            gameEndTimestamp,            
+
+            matchEntries, 
+            owner
           }
         })
       })
@@ -90,7 +103,7 @@ export const useSearchStore = defineStore('search', {
         tiers: [],
         bookmarked: false
       }      
-      this.iconUrl = `${config.imgUrl}/${this.iconCdnVersion}/img/profileicon/${profileIconId}.png`     
+      this.iconUrl = `${urlConfig.imgUrl}/${this.iconCdnVersion}/img/profileicon/${profileIconId}.png`     
 
 
       // done phase

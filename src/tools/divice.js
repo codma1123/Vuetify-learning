@@ -18,6 +18,15 @@ export const contentSize = {
   SUMMONER_TOTAL_MATCHES_HEIGHT: 1000,
 
   SUMMONER_TOTAL_MATCHES_RECENT_HEIGHT: 170,
-  SUMMONER_TOTAL_MATCH_HEIGHT: 110
+  SUMMONER_TOTAL_MATCH_HEIGHT: 110,
 
+  CHAMPION_ICON_SIZE: 60,
+  ITEM_ICON_SIZE: 22
+
+}
+
+export const urlConfig = {
+  baseUrl: 'https://kr.api.riotgames.com',
+  asiaUrl: 'https://asia.api.riotgames.com',
+  imgUrl: 'https://ddragon.leagueoflegends.com/cdn'
 }
