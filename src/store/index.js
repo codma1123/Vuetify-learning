@@ -8,7 +8,7 @@ const API_KEYS = [
   'RGAPI-8d145ff2-f5f3-43ad-9e38-0232dc06690f'
 ]
 
-const REQUEST_COUNT = 10
+const REQUEST_COUNT = 18
 
 const HEADER = {
   headers: {
@@ -62,7 +62,7 @@ export const useSearchStore = defineStore('search', {
           console.log(owner)
 
           const totalKills = teams.find(team => team.teamId == owner.teamId).objectives.champion.kills
-                    
+                              
           const matchEntries = participants.map(participant => {
             const { championName, championId } = participant
             const itemsUrls = Array.from({length: 7}).map((_, i) => {
@@ -71,12 +71,15 @@ export const useSearchStore = defineStore('search', {
                                     })                                                                                                                                                     
             return { championName, championId, itemsUrls }
           })
+
+          
           
           return { 
             gameMode,
             gameDuration,  
             gameEndTimestamp,    
-            totalKills,        
+            totalKills,     
+            participants,   
 
             matchEntries, 
             owner

@@ -90,7 +90,7 @@
         
 
       <!-- ItemsArea -->
-      <div class="owner-icons mt-3 ml-2">
+      <div class="owner-icons mt-2 ml-2">
         <div 
           v-for="(itemUrl, i) in ownerItemIconUrls"
           :key="i"
@@ -110,19 +110,55 @@
 
         <span v-if="multikill" class="multikill">
           {{ multikill }}
-        </span>
-        
+        </span>        
       </div>
     </div>
 
     <div class="entries d-flex" >
-      <div class="team">
-        
+      <div class="match-entries">
+        <div 
+          class="match-entry"
+           v-for="(entry, i) in matchEntries.slice(0, 5)"
+          :key="i"
+          @click="pushEntry(entry.name)"
+        >
+          <v-avatar 
+            rounded="md" 
+            :size="contentSize.CHAMPION_ENTRIES_ICON_SIZE"
+          >
+            <v-img :src="entry.url"></v-img>                        
+          </v-avatar>
+          <span :style="myNameBoldStyle(entry.name)">
+            {{ entry.name }}
+          </span>
+        </div>
       </div>
-      <div class="emery">
-        
+
+      <div class="match-entries">
+        <div 
+          class="match-entry"
+           v-for="(entry, i) in matchEntries.slice(5, 10)"
+          :key="i"
+          @click="pushEntry(entry.name)"
+        >
+          <v-avatar 
+            rounded="md" 
+            :size="contentSize.CHAMPION_ENTRIES_ICON_SIZE"
+          >
+            <v-img :src="entry.url"></v-img>                        
+          </v-avatar>
+          <span :style="myNameBoldStyle(entry.name)">
+            {{ entry.name }}
+          </span>
+        </div>
       </div>
     </div>
+
+    <div :style="winLabel.foldStyle" :class="[foldClass, match.owner.win ? 'fold-win' : 'fold-loss']">
+      <v-icon :color="match.owner.win ? '#5383e8' : '#d94055'">
+         mdi-chevron-down
+      </v-icon>
+    </div>  
 
   </v-sheet>  
 </template>
@@ -131,8 +167,10 @@
 import { computed, onMounted, ref } from 'vue'
 import useSizeSetup from '@/tools/SizeSetup.vue'
 import runeJSON from '@/assets/runesReforged.json'
+import championJSON from '@/assets/championInfo.json'
 
 import KillChip from '../components/KillChip.vue'
+import { useRoute, useRouter } from 'vue-router'
 
 export default {
   props: {
@@ -142,6 +180,9 @@ export default {
     KillChip
   },
   setup(props) {
+    const route = useRoute()
+    const router = useRouter()
+
     const { contentSize, funcs, urlConfig, searchStore } = useSizeSetup()    
     const gameModeMap = new Map([['CLASSIC', '일반'], ['ARAM', '무작위 총력전']])    
     const spellEnum = {
@@ -170,6 +211,9 @@ export default {
         },
         verticalStyle: {
           'color': '#4447a3',          
+        },
+        foldStyle: {
+          'background-color': '#2f436e',          
         }
       } :
       {
@@ -184,8 +228,10 @@ export default {
           'background-color': '#703C47'
         },
         verticalStyle: {
-          'color': '#bc2b3e',
-                    
+          'color': '#bc2b3e',                            
+        },
+        foldStyle: {                              
+          'background-color': '#703c47',          
         }
       }      
     )
@@ -200,8 +246,13 @@ export default {
       'color': '#9E9EB1',
       'margin-left': '.6rem'
     }
-    
 
+    const foldClass = 'ml-7 text-center justify-center d-flex align-content-end flex-wrap'
+
+    function myNameBoldStyle(name) {
+      if (name === route.params.name) return {'color': 'white'}
+    }
+    
     const gameMode = computed(() => gameModeMap.get(props.match.gameMode))
 
     const duration = computed(() => funcs.convertHMS(props.match.gameDuration).split(':').slice(1))
@@ -227,7 +278,6 @@ export default {
 
       return 0
     })
-
 
     /* 
      각 이미지들은 다른 컴포넌트에서도 사용할 수 있을거같으므로,
@@ -273,12 +323,28 @@ export default {
     })
 
     const csPerMin = computed(() => parseFloat((props.match.owner.totalMinionsKilled / Number(duration.value[0])).toFixed(1)))
+
     const averageTier = computed(() => {})
 
-          
-    onMounted(() => {
+    
+    const matchEntries = computed(() => {
+      const championData = Object.values(championJSON.data)            
+      const ids = props.match.participants.map(participants => participants.championId)      
+      const results = ids.map(id => championData.find(champ => champ.key == id)).map(result => result.image.full)
+      const name = props.match.participants.map(participants => participants.summonerName)
       
+      return results.map((result, i) => ({
+        name: name[i],
+        url: `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${result}`,
+      }))    
     })
+
+    function pushEntry(payload) {
+      router.push(`/summoner/${payload}`)
+      searchStore.searchContent(payload)
+    }
+          
+    onMounted(() => {})
 
     return {
       contentSize,     
@@ -287,6 +353,7 @@ export default {
       winLabel,
       overrideFontStyle,
       defaultFontStyle,
+      foldClass,
 
       // computed values
       gameMode,
@@ -302,7 +369,13 @@ export default {
       multikill,
       killInvolvementArea,
       csPerMin,
-      averageTier
+      averageTier,
+      matchEntries,
+
+
+
+      pushEntry,
+      myNameBoldStyle
     }
   }
 }
@@ -413,6 +486,40 @@ export default {
 .owner-cs {
   font-size: 13px;
   color: #9E9EB1;
+}
+
+.team {
+  font-size: 13px;
+  color: #9E9EB1;
+  max-width: 100px;
+}
+
+.match-entries {
+  font-size: 13px;
+  color: #9E9EB1;
+  max-width: 100px;  
+}
+
+.match-entry {
+  font-size: 13px;
+  width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+}
+
+.fold {
+  min-width: 40px;
+}
+
+
+.fold-loss:hover {
+  background-color: #59343B !important;
+}
+
+.fold-win:hover {
+  background-color: #28344E !important;
 }
 
 

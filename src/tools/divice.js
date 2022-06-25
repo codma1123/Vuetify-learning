@@ -22,8 +22,9 @@ export const contentSize = {
 
   CHAMPION_ICON_SIZE: 54,
   ITEM_ICON_SIZE: 22,
-  SPELL_ICON_SIZE: 23
+  SPELL_ICON_SIZE: 23,
 
+  CHAMPION_ENTRIES_ICON_SIZE: 18
 }
 
 export const urlConfig = {
