@@ -59,7 +59,6 @@ export const useSearchStore = defineStore('search', {
           // owner
           const owner = participants.find(participant => participant.summonerName === name)
           owner.itemUrls = Array.from({length: 7}).map((_, i) => owner[`item${i}`])
-          console.log(owner)
 
           const totalKills = teams.find(team => team.teamId == owner.teamId).objectives.champion.kills
                               

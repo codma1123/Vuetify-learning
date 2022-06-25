@@ -24,6 +24,7 @@
         <!-- ChampionIconArea-->
         <v-avatar 
           rounded="md" 
+          class="owner-champion-icon"
           :size="contentSize.CHAMPION_ICON_SIZE"
         >
           <v-img :src="ownerChampionIconUrl"></v-img>            
@@ -90,7 +91,7 @@
         
 
       <!-- ItemsArea -->
-      <div class="owner-icons mt-2 ml-2">
+      <div class="owner-items-icons mt-2 ml-2">
         <div 
           v-for="(itemUrl, i) in ownerItemIconUrls"
           :key="i"
@@ -128,7 +129,7 @@
           >
             <v-img :src="entry.url"></v-img>                        
           </v-avatar>
-          <span :style="myNameBoldStyle(entry.name)">
+          <span class="match-entry-name" :style="myNameBoldStyle(entry.name)">
             {{ entry.name }}
           </span>
         </div>
@@ -147,7 +148,7 @@
           >
             <v-img :src="entry.url"></v-img>                        
           </v-avatar>
-          <span :style="myNameBoldStyle(entry.name)">
+          <span class="match-entry-name" :style="myNameBoldStyle(entry.name)">
             {{ entry.name }}
           </span>
         </div>
@@ -180,6 +181,7 @@ export default {
     KillChip
   },
   setup(props) {
+
     const route = useRoute()
     const router = useRouter()
 
@@ -416,13 +418,17 @@ export default {
   
 }
 
-.owner-icons {
+.owner-items-icons {
   display: flex;
 }
 
 .champion-kda {
   display: flex;
   min-width: 440px;  
+}
+
+.owner-champion-icon {
+  cursor: pointer;
 }
 
 .empty-item {
@@ -506,11 +512,16 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  
+  cursor: pointer;  
+}
+
+.match-entry-name:hover {
+  text-decoration: underline !important;
 }
 
 .fold {
   min-width: 40px;
+  cursor: pointer;
 }
 
 
