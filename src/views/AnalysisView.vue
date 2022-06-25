@@ -108,7 +108,9 @@ export default {
       'TOP', 'JG', 'MID', 'AD', 'SUP' 
     ]
 
-    onMounted(() => {})
+    onMounted(() => {
+      window.scrollTo({ left: 0, top: 0, behavior: "smooth" });
+    })
 
     return {
       // css values
