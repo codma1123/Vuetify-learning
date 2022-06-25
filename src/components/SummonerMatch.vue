@@ -247,7 +247,7 @@ export default {
       'margin-left': '.6rem'
     }
 
-    const foldClass = 'ml-7 text-center justify-center d-flex align-content-end flex-wrap'
+    const foldClass = 'ml-7 fold text-center justify-center d-flex align-content-end flex-wrap'
 
     function myNameBoldStyle(name) {
       if (name === route.params.name) return {'color': 'white'}
