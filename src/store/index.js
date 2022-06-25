@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-c8e8994a-20a9-45fb-8922-a1107add8cc3'
+const API_KEY = 'RGAPI-dd75c77d-0364-4e76-b2ca-407d6a6c8ce4'
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
   'RGAPI-8d145ff2-f5f3-43ad-9e38-0232dc06690f'
 ]
 
-const REQUEST_COUNT = 6
+const REQUEST_COUNT = 2
 
 const HEADER = {
   headers: {
@@ -27,10 +27,13 @@ export const useSearchStore = defineStore('search', {
     loadComplate: false,
     iconCdnVersion: '',
     iconUrl: '',
-    isRankGame: false
+    isRankGame: false,
+    tryLoad: false
    }),  
   actions: {
-    async searchContent(name) {            
+
+    async searchContent(name) {           
+      this.tryLoad = true 
       this.userInfoLoaded = true
       this.isRankGame = false
             
@@ -52,17 +55,13 @@ export const useSearchStore = defineStore('search', {
       await axios.all(matchIdUrls.map(match => axios.get(match))).then(reses => {
         this.matches = reses.map(res => {
           const { gameMode, participants, gameDuration, gameEndTimestamp, teams } = res.data.info          
-
-
+          
           // owner
           const owner = participants.find(participant => participant.summonerName === name)
-          const { championName, championId, champLevel, kills, assists, deaths, totalMinionsKilled: cs,
-            largestMultikill, summoner1Id, summoner2Id
-           } = owner
-          console.log(owner)
           owner.itemUrls = Array.from({length: 7}).map((_, i) => owner[`item${i}`])
+          console.log(owner)
 
-          const { win } = teams.find(team => team.teamId === owner.teamId)
+          const totalKills = teams.find(team => team.teamId == owner.teamId).objectives.champion.kills
                     
           const matchEntries = participants.map(participant => {
             const { championName, championId } = participant
@@ -74,10 +73,10 @@ export const useSearchStore = defineStore('search', {
           })
           
           return { 
-            win,                 
             gameMode,
             gameDuration,  
-            gameEndTimestamp,            
+            gameEndTimestamp,    
+            totalKills,        
 
             matchEntries, 
             owner
@@ -114,7 +113,8 @@ export const useSearchStore = defineStore('search', {
 
     async setupUserIconCDN() {
       const res = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json')
-      this.iconCdnVersion = res.data[0]            
+      this.iconCdnVersion = res.data[0]      
+      console.log(this.iconCdnVersion = res.data[0]      )      
     }
   },
 

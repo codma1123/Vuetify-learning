@@ -137,7 +137,8 @@ import SummonerChampions from '../components/SummonerChampions.vue'
 
 export default {
   components: {
-    SummonerChampions
+    SummonerChampions,
+    
   },
   setup() {
     const route = useRoute()

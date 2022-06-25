@@ -33,7 +33,19 @@ function timeForToday(value) {
   return `${Math.floor(betweenTimeDay / 365)} 년 전`;
 }
 
+function betweenTime(value) {
+  const today = new Date();
+  const timeValue = new Date(value);
+
+  return Math.floor((today.getTime() - timeValue.getTime()) / 1000 / 60);
+}
+
+function createIconUrl (iconUrl) {
+  
+}
+
 export default {
   convertHMS,
-  timeForToday
+  timeForToday,
+  betweenTime
 }

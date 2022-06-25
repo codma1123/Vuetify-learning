@@ -131,7 +131,7 @@ export default {
 
 .recent-matches {
   margin-top: 3px;
-  margin-bottom: 5px;
+  margin-bottom: 7px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
 }

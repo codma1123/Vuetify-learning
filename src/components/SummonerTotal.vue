@@ -1,12 +1,10 @@
 <template>
-  <v-sheet           
-    height="1000"
+  <v-sheet               
     class="d-flex justify-center mx-auto"
     color="#121212"             
   >
     <v-sheet                                
-      :width="contentSize.MAIN_CONTENT_SHEET_SIZE - 40"        
-      :height="contentSize.SUMMONER_INFO_SHEET_HEIGHT"
+      :width="contentSize.MAIN_CONTENT_SHEET_SIZE - 40"              
       color="#121212"
       v-if="!searchStore.userInfoLoaded"
     >      
@@ -30,6 +28,8 @@ import useSizeSetup from '@/tools/SizeSetup.vue'
 import SummonerTotalTier from './SummonerTotalTier.vue'
 import SummonerTotalTierChampions from './SummonerTotalTierChampions.vue'
 import SummonerTotalMatches from './SummonerTotalMatches.vue'
+import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
 export default {
   components: {
@@ -39,6 +39,17 @@ export default {
   },
   setup() {
     const { contentSize, searchStore } = useSizeSetup()
+    const route = useRoute()
+
+    onMounted(() => {
+      setTimeout(() => {
+        if(!searchStore.tryLoad) {
+          console.log('f5..?')
+          searchStore.searchContent(route.params.name)
+        }
+      })
+
+    })
     return {
       contentSize,
       searchStore
