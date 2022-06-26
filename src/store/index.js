@@ -8,7 +8,7 @@ const API_KEYS = [
   'RGAPI-8d145ff2-f5f3-43ad-9e38-0232dc06690f'
 ]
 
-const REQUEST_COUNT = 5
+const REQUEST_COUNT = 10
 
 const HEADER = {
   headers: {

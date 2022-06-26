@@ -314,6 +314,7 @@ export default {
       '7': 'SummonerHeal',
       '11': 'SummonerSmite',
       '12': 'SummonerTeleport',
+      '13': 'SummonerMana',
       '14': 'SummonerDot',
       '32': 'SummonerSnowURFSnowball_Mark'
 
@@ -369,10 +370,6 @@ export default {
     }
 
     const foldClass = 'ml-7 fold text-center justify-center d-flex align-content-end flex-wrap'
-
-    function myNameBoldStyle(name) {
-      if (name === route.params.name) return {'color': 'white'}
-    }
     
     const gameMode = computed(() => gameModeMap.get(props.match.gameMode))
     const duration = computed(() => funcs.convertHMS(props.match.gameDuration).split(':').slice(1))
@@ -402,14 +399,8 @@ export default {
      추후 STORE로 이전할 수 있음.
     */ 
 
-    const ownerChampionIconUrl = computed(() => 
-      `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${props.match.owner.championName}.png`      
-    )
-
-    const ownerItemIconUrls = computed(() =>     
-      props.match.owner.itemUrls.map(item => `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/item/${item}.png`)        
-    )
-
+    const ownerChampionIconUrl = computed(() => `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${props.match.owner.championName}.png`)
+    const ownerItemIconUrls = computed(() => props.match.owner.itemUrls.map(item => `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/item/${item}.png`))
     const entriesItemIconUrls = computed(() => props.match.matchEntries.map(matchEntries => matchEntries.itemsUrls))
 
     const ownerSpellIconUrls = computed(() => ([
@@ -423,31 +414,14 @@ export default {
       const mainRuneObj = runeJSON.find(mainRune => mainRune.id === mainRuneTypeId)
       const runeObj = mainRuneObj?.slots[0].runes.find(rune => rune.id === runeId)      
 
-      return [
-        `${urlConfig.imgUrl}/img/${runeObj.icon}`,
-        `${urlConfig.imgUrl}/img/${mainRuneObj.icon}`
-      ]
+      return [`${urlConfig.imgUrl}/img/${runeObj.icon}`, `${urlConfig.imgUrl}/img/${mainRuneObj.icon}`]
     })
     
-    const score = computed(() => {
-      const owner = props.match.owner
-
-      if (owner.deaths === 0) return 'Perfect'
-      return ((owner.kills + owner.assists) / owner.deaths).toFixed(2) + ':1'
-    })
-
-    const killInvolvementArea = computed(() => {
-      const involvementarea = props.match.owner.kills + props.match.owner.assists    
-
-      if(!involvementarea) return 0
-      return Math.ceil(involvementarea / props.match.totalKills * 100)
-    })
-
+    const score = computed(() => !props.match.owner.deaths ? 'Perfect' : ((props.match.owner.kills + props.match.owner.assists) / props.match.owner.deaths).toFixed(2) + ':1')
+    const killInvolvementArea = computed(() => !(props.match.owner.kills + props.match.owner.assists) ? 0 : Math.ceil(props.match.owner.kills + props.match.owner.assists / props.match.totalKills * 100))
     const csPerMin = computed(() => parseFloat((props.match.owner.totalMinionsKilled / Number(duration.value[0])).toFixed(1)))
-
     const averageTier = computed(() => {})
     
-
     const matchEntries = computed(() => {
       const championData = Object.values(championJSON.data)            
       const ids = props.match.participants.map(participant => participant.championId)      
@@ -456,17 +430,16 @@ export default {
         summoner1Id: participant.summoner1Id,
         summoner2Id: participant.summoner2Id        
       }))
-      const results = ids.map(id => championData.find(champ => champ.key == id)).map(result => result.image.full)
+      const championImageName = ids.map(id => championData.find(champ => champ.key == id)).map(result => result.image.full)
 
-      return results.map((result, i) => ({
+      return championImageName.map((imageName, i) => ({
         name: name[i],
         spell: spell[i],
-        url: `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${result}`,        
+        url: `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${imageName}`,        
       }))    
     })
 
     const orderedMatchEntries = computed(() => {
-      // const [one, two] = [matchEntries.value.slice(0, 5), matchEntries.value.slice(5, 10)]  
       const newEntries = matchEntries.value.map(entry => ({
         ...entry,
         spellIconUrls: createSpellUrls(entry.spell) 
@@ -484,9 +457,6 @@ export default {
       searchStore.searchContent(payload)
     }
 
-    function copyLink() {
-      navigator.clipboard.writeText(matchLink.value).then(() => copyLinkText.value = 'Copied')
-    }
 
     const viewSelectToggleButtons = [
       {
@@ -515,9 +485,7 @@ export default {
     }
 
           
-    onMounted(() => {
-      console.log(props.match.participants.map(player => createSpellUrls(player)))
-    })
+    onMounted(() => {})
 
     return {
       contentSize,     
@@ -552,12 +520,11 @@ export default {
       seeMoreExpand,
       viewSelectToggleButtons,
       copyLinkText,
-      copyLink,
-
+      copyLink: () => navigator.clipboard.writeText(matchLink.value).then(() => copyLinkText.value = 'Copied'),
 
       pushEntry,
-      myNameBoldStyle
-    }
+      myNameBoldStyle: name => name === route.params.name ? {'color': 'white'} : ''
+    }        
   }
 }
 </script>
