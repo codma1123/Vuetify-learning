@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-dd75c77d-0364-4e76-b2ca-407d6a6c8ce4'
+const API_KEY = 'RGAPI-e95c5e34-1d82-4f9b-9781-155ec6939599'
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
   'RGAPI-8d145ff2-f5f3-43ad-9e38-0232dc06690f'
 ]
 
-const REQUEST_COUNT = 18
+const REQUEST_COUNT = 5
 
 const HEADER = {
   headers: {

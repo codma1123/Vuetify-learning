@@ -21,6 +21,7 @@
 
     <div class="icons mt-2">  
       <div class="champion-kda">
+
         <!-- ChampionIconArea-->
         <v-avatar 
           rounded="md" 
@@ -61,8 +62,7 @@
             class="full-item sub-rune"
             rounded="md"            
             :src="runeIconUrls[1]"
-          >
-          </v-img>
+          ></v-img>
         </div>
 
         <!-- KDAARea -->
@@ -115,6 +115,8 @@
       </div>
     </div>
 
+
+    <!-- MatchEntries -->
     <div class="entries d-flex" >
       <div class="match-entries">
         <div 
@@ -155,13 +157,125 @@
       </div>
     </div>
 
-    <div :style="winLabel.foldStyle" :class="[foldClass, match.owner.win ? 'fold-win' : 'fold-loss']">
+    <!-- SeeMoreButton -->
+    <div 
+      @click="seeMoreExpand = !seeMoreExpand"
+      :style="winLabel.foldStyle" :class="[foldClass, match.owner.win ? 'fold-win' : 'fold-loss']">
       <v-icon :color="match.owner.win ? '#5383e8' : '#d94055'">
-         mdi-chevron-down
+         {{ seeMoreExpand ? 'mdi-rotate-180 ' : '' }}mdi-chevron-down
       </v-icon>
     </div>  
 
   </v-sheet>  
+
+
+  <!-- SeeMore -->
+
+  <!-- MatchLink -->
+  <v-sheet
+    class="match-link d-flex align-center"
+    v-if="seeMoreExpand"
+    color="subcontent"
+    :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
+    :height="contentSize.SUMMONER_TOTAL_MATCH_SEEMORE_LINK_HEIGHT"
+  >      
+    <div class="match-link-url">
+      <img src="../../public/icon-link.svg" id="link-copy-svg">
+      {{ matchLink }}
+    </div>
+    <button @click="copyLink" class="match-link-copy-btn">
+      {{ copyLinkText }}
+    </button>
+  </v-sheet>
+
+  <!-- MatchSeeMoreMenus -->
+  <v-sheet
+    class="matches d-flex justify-space-between align-center"
+    v-if="seeMoreExpand"
+    color="subcontent"
+    :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
+    :height="contentSize.SUMMONER_TOTAL_MATCH_SEEMORE_FILTER_HEIGHT"
+  >
+    <v-btn                          
+      class="ml-1 mr-1 filter-menu"      
+      rounded="md"            
+      v-for="(button, i) in viewSelectToggleButtons"
+      elevation="0"
+      :color="button.activate ? '#515163' : 'subcontent'"         
+      exact
+      :key="i"      
+    >
+      <span :class="button.activate ? 'font-weight-bold' : ''">
+        {{ button.name }}        
+      </span>
+    </v-btn>    
+  </v-sheet>
+
+  <!-- SeeMoreContent -->
+  <v-sheet
+    class="matches"
+    v-if="seeMoreExpand"
+    :color="match.owner.win ? '#28344E' : '#59343B'"
+    :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
+    :height="contentSize.SUMMONER_TOTAL_MATCH_SEEMORE_HEIGHT"
+  >
+    <v-sheet 
+      color="subcontent"
+      :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
+      height="30"
+    >  
+    </v-sheet>
+
+
+    <!-- PlayerEntries -->
+    <template v-for="(team, i) in orderedMatchEntries" :key="i">
+      <div                 
+        :color="i === 0 && match.owner.win ? '#28344E' : '#59343B'"
+        class="seemore-entry d-flex align-center ml-1"
+        v-for="(entry, j) in team"
+        :key="j"        
+      >
+        <v-avatar 
+          rounded="md" 
+          :size="30"
+        >
+          <v-img :src="entry.url"></v-img>                        
+        </v-avatar>
+        <v-img                      
+          v-for="(url, k) in entry.spellIconUrls"
+          :key="k"
+          rounded="md"
+          :max-height="contentSize.ENTRY_SPELL_ICON_SIZE"
+          :max-width="contentSize.ENTRY_SPELL_ICON_SIZE"
+          :src="url"
+        >            
+        </v-img>
+
+        <div 
+          @click="pushEntry(entry.name)"
+          class="match-entry-name match-entry-name-seemore ml-1" :style="myNameBoldStyle(entry.name)">
+          {{ entry.name }}
+        </div>
+
+
+
+      </div>
+    </template>
+
+    <v-sheet       
+      :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
+      height="50"
+    >  
+    </v-sheet>
+    <v-sheet 
+      color="subcontent"
+      :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
+      height="30"
+    >  
+
+    </v-sheet>
+  </v-sheet>
+
 </template>
 
 <script>
@@ -186,6 +300,11 @@ export default {
     const router = useRouter()
 
     const { contentSize, funcs, urlConfig, searchStore } = useSizeSetup()    
+
+    const seeMoreExpand = ref(false)
+    const copyLinkText = ref('Copy Link')
+    const matchLink = ref('https://www.op.gg/summoners/kr/%EB%85%B9%EC%84%A0%EB%A9%80/matches/KgLASefpaoC8nMu0qdN7T43ZjUUaljhiqiD4dAfWR0A%3D/1656168003000')
+
     const gameModeMap = new Map([['CLASSIC', '일반'], ['ARAM', '무작위 총력전']])    
     const spellEnum = {
       '1': 'SummonerBoost',
@@ -256,9 +375,7 @@ export default {
     }
     
     const gameMode = computed(() => gameModeMap.get(props.match.gameMode))
-
     const duration = computed(() => funcs.convertHMS(props.match.gameDuration).split(':').slice(1))
-
     const timesAgo = computed(() => {
       const v = funcs.timeForToday(props.match.gameEndTimestamp)
       switch (v) {
@@ -277,7 +394,6 @@ export default {
       if(quadraKills) return '쿼드라킬'
       if(tripleKills) return '트리플킬'
       if(doubleKills) return '더블킬'
-
       return 0
     })
 
@@ -294,6 +410,8 @@ export default {
       props.match.owner.itemUrls.map(item => `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/item/${item}.png`)        
     )
 
+    const entriesItemIconUrls = computed(() => props.match.matchEntries.map(matchEntries => matchEntries.itemsUrls))
+
     const ownerSpellIconUrls = computed(() => ([
        `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/spell/${spellEnum[props.match.owner.summoner1Id + '']}.png`,
       `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/spell/${spellEnum[props.match.owner.summoner2Id + '']}.png`
@@ -302,7 +420,6 @@ export default {
     const runeIconUrls = computed(() => {
       const runeId = props.match.owner.perks.styles[0].selections[0].perk
       const mainRuneTypeId = props.match.owner.perks.styles[0].style
-
       const mainRuneObj = runeJSON.find(mainRune => mainRune.id === mainRuneTypeId)
       const runeObj = mainRuneObj?.slots[0].runes.find(rune => rune.id === runeId)      
 
@@ -314,12 +431,14 @@ export default {
     
     const score = computed(() => {
       const owner = props.match.owner
+
       if (owner.deaths === 0) return 'Perfect'
       return ((owner.kills + owner.assists) / owner.deaths).toFixed(2) + ':1'
     })
 
     const killInvolvementArea = computed(() => {
-      const involvementarea = props.match.owner.kills + props.match.owner.assists      
+      const involvementarea = props.match.owner.kills + props.match.owner.assists    
+
       if(!involvementarea) return 0
       return Math.ceil(involvementarea / props.match.totalKills * 100)
     })
@@ -327,26 +446,78 @@ export default {
     const csPerMin = computed(() => parseFloat((props.match.owner.totalMinionsKilled / Number(duration.value[0])).toFixed(1)))
 
     const averageTier = computed(() => {})
-
     
+
     const matchEntries = computed(() => {
       const championData = Object.values(championJSON.data)            
-      const ids = props.match.participants.map(participants => participants.championId)      
+      const ids = props.match.participants.map(participant => participant.championId)      
+      const name = props.match.participants.map(participant => participant.summonerName)    
+      const spell = props.match.participants.map(participant => ({
+        summoner1Id: participant.summoner1Id,
+        summoner2Id: participant.summoner2Id        
+      }))
       const results = ids.map(id => championData.find(champ => champ.key == id)).map(result => result.image.full)
-      const name = props.match.participants.map(participants => participants.summonerName)
-      
+
       return results.map((result, i) => ({
         name: name[i],
-        url: `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${result}`,
+        spell: spell[i],
+        url: `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${result}`,        
       }))    
+    })
+
+    const orderedMatchEntries = computed(() => {
+      // const [one, two] = [matchEntries.value.slice(0, 5), matchEntries.value.slice(5, 10)]  
+      const newEntries = matchEntries.value.map(entry => ({
+        ...entry,
+        spellIconUrls: createSpellUrls(entry.spell) 
+      }))
+
+      const [one, two] = [newEntries.slice(0, 5), newEntries.slice(5, 10)]
+
+      return matchEntries.value.map(entry => entry.name).indexOf(route.params.name) < 5 
+      ? [one, two]
+      : [two, one]      
     })
 
     function pushEntry(payload) {
       router.push(`/summoner/${payload}`)
       searchStore.searchContent(payload)
     }
+
+    function copyLink() {
+      navigator.clipboard.writeText(matchLink.value).then(() => copyLinkText.value = 'Copied')
+    }
+
+    const viewSelectToggleButtons = [
+      {
+        name: '종합',
+        activate: true,
+      },
+      {
+        name: '팀 분석',
+        activate: false,
+      },
+      {
+        name: '빌드',
+        activate: false,
+      },
+      {
+        name: 'etc',
+        activate: false,
+      }
+    ]
+
+    function createSpellUrls(player) {
+      return [
+        `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/spell/${spellEnum[player.summoner1Id + '']}.png`,
+        `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/spell/${spellEnum[player.summoner2Id + '']}.png`
+      ]
+    }
+
           
-    onMounted(() => {})
+    onMounted(() => {
+      console.log(props.match.participants.map(player => createSpellUrls(player)))
+    })
 
     return {
       contentSize,     
@@ -367,13 +538,21 @@ export default {
       ownerItemIconUrls,
       ownerSpellIconUrls,
       runeIconUrls,
+      entriesItemIconUrls,
 
       multikill,
       killInvolvementArea,
       csPerMin,
       averageTier,
       matchEntries,
+      orderedMatchEntries,
+      matchLink,
 
+      // seeMore
+      seeMoreExpand,
+      viewSelectToggleButtons,
+      copyLinkText,
+      copyLink,
 
 
       pushEntry,
@@ -517,6 +696,12 @@ export default {
 
 .match-entry-name:hover {
   text-decoration: underline !important;
+  cursor: pointer;
+}
+
+.match-entry-name-seemore {
+  font-size: 12px;
+  color: white;
 }
 
 .fold {
@@ -531,6 +716,56 @@ export default {
 
 .fold-win:hover {
   background-color: #28344E !important;
+}
+
+.match-link {
+  border-radius: 5px;  
+  margin-top: -1.5px;
+  margin-bottom: 6px;
+}
+
+.match-link-url {  
+  display: flex;
+  align-items: center;
+  font-size: 12px;  
+  margin: 0px 5px 0px 5px;
+  padding: 5px; 
+  padding-left: 10px;     
+  background-color: #1C1C1F;
+  border-radius: 5px;
+  flex-grow: 1;
+  color: #9E9EB1;
+  vertical-align: middle;
+  text-overflow: hidden;
+  overflow: hidden;  
+}
+
+.match-link-copy-btn {
+  width: 10%;
+  font-size: 14px;
+  padding: 3px 0px;
+  border-radius: 5px;
+  margin-right: 5px;
+  font-weight: 300;
+  background-color: #00bba3;
+}
+
+.match-link-copy-btn:hover {
+  
+}
+
+#link-copy-svg {
+  margin-right: 6px;
+  height: 17px;
+}
+
+.filter-menu {
+  min-width: 24%;
+}
+
+
+.seemore-entry {
+  min-height: 39px;  
 }
 
 
