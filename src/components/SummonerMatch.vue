@@ -55,13 +55,13 @@
             <v-img            
               class="full-item main-rune"
               rounded="md"              
-              :src="runeIconUrls[0]"
+              :src="ownerRuneIconUrls[0]"
             ></v-img>            
           </v-avatar>          
           <v-img            
             class="full-item sub-rune"
             rounded="md"            
-            :src="runeIconUrls[1]"
+            :src="ownerRuneIconUrls[1]"
           ></v-img>
         </div>
 
@@ -237,25 +237,49 @@
       >
         <v-avatar 
           rounded="md" 
-          :size="30"
+          :size="35"
         >
           <v-img :src="entry.url"></v-img>                        
-        </v-avatar>
-        <v-img                      
-          v-for="(url, k) in entry.spellIconUrls"
-          :key="k"
-          rounded="md"
-          :max-height="contentSize.ENTRY_SPELL_ICON_SIZE"
-          :max-width="contentSize.ENTRY_SPELL_ICON_SIZE"
-          :src="url"
-        >            
-        </v-img>
+        </v-avatar>    
+    
+        <div>
+          <div
+            v-for="(url, k) in entry.spellIconUrls"
+            :key="k"
+          >
+            <img :src="url" id="entry-spell"/>
+            <!-- <v-img                                  
+              rounded="md"
+              :max-height="contentSize.ENTRY_SPELL_ICON_SIZE"
+              :max-width="contentSize.ENTRY_SPELL_ICON_SIZE"
+              :src="url"
+            >            
+            </v-img>   -->
+          </div>
+        </div>
+        <div>
+          <div
+            v-for="(url, k) in entry.runeIconUrls"
+            :key="k"
+          >
+            <img :src="url" id="entry-spell"/>
+            <!-- <v-img                                  
+              rounded="md"
+              :max-height="contentSize.ENTRY_SPELL_ICON_SIZE"
+              :max-width="contentSize.ENTRY_SPELL_ICON_SIZE"
+              :src="url"
+            >            
+            </v-img>   -->
+          </div>
+        </div>
 
         <div 
           @click="pushEntry(entry.name)"
           class="match-entry-name match-entry-name-seemore ml-1" :style="myNameBoldStyle(entry.name)">
           {{ entry.name }}
         </div>
+
+        {{ entry.kills }}
 
 
 
@@ -408,14 +432,7 @@ export default {
       `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/spell/${spellEnum[props.match.owner.summoner2Id + '']}.png`
     ]))
 
-    const runeIconUrls = computed(() => {
-      const runeId = props.match.owner.perks.styles[0].selections[0].perk
-      const mainRuneTypeId = props.match.owner.perks.styles[0].style
-      const mainRuneObj = runeJSON.find(mainRune => mainRune.id === mainRuneTypeId)
-      const runeObj = mainRuneObj?.slots[0].runes.find(rune => rune.id === runeId)      
-
-      return [`${urlConfig.imgUrl}/img/${runeObj.icon}`, `${urlConfig.imgUrl}/img/${mainRuneObj.icon}`]
-    })
+    const ownerRuneIconUrls = computed(() => createRuneUrls(props.match.owner.perks))
     
     const score = computed(() => !props.match.owner.deaths ? 'Perfect' : ((props.match.owner.kills + props.match.owner.assists) / props.match.owner.deaths).toFixed(2) + ':1')
     const killInvolvementArea = computed(() => !(props.match.owner.kills + props.match.owner.assists) ? 0 : Math.ceil(props.match.owner.kills + props.match.owner.assists / props.match.totalKills * 100))
@@ -426,6 +443,9 @@ export default {
       const championData = Object.values(championJSON.data)            
       const ids = props.match.participants.map(participant => participant.championId)      
       const name = props.match.participants.map(participant => participant.summonerName)    
+      const rune = props.match.participants.map(participant => participant.perks)
+      const kills = props.match.participants.map(participant => participant.kills)
+
       const spell = props.match.participants.map(participant => ({
         summoner1Id: participant.summoner1Id,
         summoner2Id: participant.summoner2Id        
@@ -435,14 +455,17 @@ export default {
       return championImageName.map((imageName, i) => ({
         name: name[i],
         spell: spell[i],
-        url: `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${imageName}`,        
+        rune: rune[i],   
+        kills: kills[i],
+        url: `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${imageName}`
       }))    
     })
 
     const orderedMatchEntries = computed(() => {
       const newEntries = matchEntries.value.map(entry => ({
         ...entry,
-        spellIconUrls: createSpellUrls(entry.spell) 
+        spellIconUrls: createSpellUrls(entry.spell),
+        runeIconUrls: createRuneUrls(entry.rune) 
       }))
 
       const [one, two] = [newEntries.slice(0, 5), newEntries.slice(5, 10)]
@@ -456,7 +479,6 @@ export default {
       router.push(`/summoner/${payload}`)
       searchStore.searchContent(payload)
     }
-
 
     const viewSelectToggleButtons = [
       {
@@ -484,8 +506,20 @@ export default {
       ]
     }
 
+    function createRuneUrls(perks) {
+      const runeId = perks.styles[0].selections[0].perk
+      const mainId = perks.styles[0].style
+      const mainObj =  runeJSON.find(mainRune => mainRune.id === mainId)
+
+      const runeObj = mainObj?.slots[0].runes.find(rune => rune.id === runeId)
+
+      return [`${urlConfig.imgUrl}/img/${runeObj.icon}`, `${urlConfig.imgUrl}/img/${mainObj.icon}`]
+    }
+
           
-    onMounted(() => {})
+    onMounted(() => {
+      console.log(props.match.participants)
+    })
 
     return {
       contentSize,     
@@ -505,7 +539,7 @@ export default {
       ownerChampionIconUrl,
       ownerItemIconUrls,
       ownerSpellIconUrls,
-      runeIconUrls,
+      ownerRuneIconUrls,
       entriesItemIconUrls,
 
       multikill,
@@ -515,6 +549,7 @@ export default {
       matchEntries,
       orderedMatchEntries,
       matchLink,
+      createRuneUrls,
 
       // seeMore
       seeMoreExpand,
@@ -703,13 +738,13 @@ export default {
   flex-grow: 1;
   color: #9E9EB1;
   vertical-align: middle;
-  text-overflow: hidden;
+  text-overflow: ellipsis;
   overflow: hidden;  
 }
 
 .match-link-copy-btn {
-  width: 10%;
-  font-size: 14px;
+  width: 12%;
+  font-size: 13px;
   padding: 3px 0px;
   border-radius: 5px;
   margin-right: 5px;
@@ -734,6 +769,16 @@ export default {
 .seemore-entry {
   min-height: 39px;  
 }
+
+#entry-spell {
+  margin-left: 2px;
+  display: flex;
+  flex-direction: column;
+  width: 16px;
+  height: 16px;
+}
+
+
 
 
 </style>

@@ -43,7 +43,7 @@ export const useSearchStore = defineStore('search', {
 
       // get league entries in all queues for a given summoner ID
       const leagueRes = await axios.get(`${urlConfig.baseUrl}/lol/league/v4/entries/by-summoner/${id}?api_key=${API_KEY}`)
-      const { queueType, rank, tier, leaguePoints, wins, losses } = leagueRes.data[0]
+      const { queueType, rank, tier, leaguePoints, wins, losses } = leagueRes?.data[0]
       
       if (queueType === 'RANKED_SOLO_5x5') this.isRankGame = true
       
