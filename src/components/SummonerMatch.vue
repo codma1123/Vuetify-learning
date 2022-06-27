@@ -231,12 +231,13 @@
         v-for="(entry, j) in team"
         :key="j"                
         min-height="36"
-        class=' d-flex align-center ml-1 pt-1 pb-1'
+        class=' d-flex align-center pt-1 pb-1'
         :color="entry.summonerName === route.params.name ? orderedMatchEntries[1][2] : orderedMatchEntries[1][i]"
       >        
         <v-avatar 
           rounded="md" 
           :size="35"
+          class="ml-2 mr-1"
         >
           <v-img :src="entry.url"></v-img>                        
         </v-avatar>    
@@ -285,9 +286,11 @@
         </template>
         <div v-else class="match-entry-seemore-opScore-empty"></div>
 
-        <div class="match-entry-seemore-kda">
-          {{ entry.kills }}/{{ entry.deaths}}/{{ entry.assists }} ({{ entry.killInvolvementArea }}%)
-          <div :style="[selectScoreFontStyle(entry.score), {'font-weight': 'bold'}]">
+        <div style="text-align: center">
+          <div class="match-entry-seemore-kda">
+            {{ entry.kills }}/{{ entry.deaths}}/{{ entry.assists }} ({{ entry.killInvolvementArea }}%)
+          </div>
+          <div :style="[selectScoreFontStyle(entry.score), {'font-weight': 'bold', 'font-size': '14px', 'opacity': '1'}]">
             {{ entry.score }}
           </div>
         </div>
@@ -928,7 +931,7 @@ export default {
 
 .match-entry-seemore-kda {
   opacity: .7;
-  font-size: 12px;
+  font-size: 12px;  
   text-align: center;
 }
 
