@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-e95c5e34-1d82-4f9b-9781-155ec6939599'
+const API_KEY = 'RGAPI-99045644-01ad-4fd3-bde7-5e8093af8a76'
+
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
   'RGAPI-8d145ff2-f5f3-43ad-9e38-0232dc06690f'
@@ -56,23 +57,17 @@ export const useSearchStore = defineStore('search', {
         this.matches = reses.map(res => {
           const { gameMode, participants, gameDuration, gameEndTimestamp, teams } = res.data.info          
           
-          // owner
-          const owner = participants.find(participant => participant.summonerName === name)
-          owner.itemUrls = Array.from({length: 7}).map((_, i) => owner[`item${i}`])
-
-          const totalKills = teams.find(team => team.teamId == owner.teamId).objectives.champion.kills
-                              
-          const matchEntries = participants.map(participant => {
-            const { championName, championId } = participant
-            const itemsUrls = Array.from({length: 7}).map((_, i) => {
-                                      const itemId = participant[`item${i}`]
-                                      return `${urlConfig.imgUrl}/${this.iconCdnVersion}/img/item/${itemId}`
-                                    })                                                                                                                                                     
-            return { championName, championId, itemsUrls }
+          // insert items url object key
+          participants.forEach(participant => {
+            participant.itemUrls = Array.from({length: 7}).map((_, i) => participant[`item${i}`])
           })
 
+          // owner
+          const owner = participants.find(participant => participant.summonerName === name)          
           
-          
+          const totalKills = teams.find(team => team.teamId == owner.teamId).objectives.champion.kills
+                              
+                  
           return { 
             gameMode,
             gameDuration,  
@@ -80,7 +75,6 @@ export const useSearchStore = defineStore('search', {
             totalKills,     
             participants,   
 
-            matchEntries, 
             owner
           }
         })
