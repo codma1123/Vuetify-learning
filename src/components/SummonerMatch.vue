@@ -6,15 +6,16 @@
     :height="contentSize.SUMMONER_TOTAL_MATCH_HEIGHT"                
     elevation="0"
   >
-    <!-- MatchWinResultArea -->
+    <!-- owner-label -->
     <div :style="winLabel.labelStyle"></div>  
       
-    <div class="gameType mt-2">
+      <!-- owner-game-type  -->
+    <div class="game-type mt-2">
       <div :style="[winLabel.fontStyle, overrideFontStyle]" class="ml-2"> {{ gameMode }} </div>
       <div :style="defaultFontStyle">
         <div> {{ timesAgo }}</div>
         <v-divider class="mt-2 mb-2" width="50"></v-divider>
-        <div class="font-weight-bold"> {{ match.owner.win ? '승리' : '패배' }}</div>
+        <div class="font-weight-bold"> {{ winText }}</div>
         <div> {{ duration[0] }}분 {{ duration[1] }}초 </div>        
       </div>
     </div>
@@ -22,7 +23,7 @@
     <div class="icons mt-2">  
       <div class="champion-kda">
 
-        <!-- ChampionIconArea-->
+        <!-- owner-champion-icon-->
         <v-avatar 
           rounded="md" 
           class="owner-champion-icon"
@@ -35,7 +36,7 @@
         </v-avatar>  
         
 
-        <!-- SpellArea -->
+        <!-- owner-spell-icon -->
         <div style="'display': 'flex'" class="ml-1">
           <v-img            
             v-for="(url, i) in ownerSpellIconUrls"
@@ -49,7 +50,7 @@
           </v-img>
         </div>
 
-         <!-- RuneArea -->
+         <!-- owner-rune-icon -->
         <div style="'display': 'flex'">
           <v-avatar size="25" color="#000000" class="runes">
             <v-img            
@@ -65,7 +66,7 @@
           ></v-img>
         </div>
 
-        <!-- KDAARea -->
+        <!-- owner-score -->
         <div class="mt-1 ml-3 kda">
           <div class="font-weight-bold text-h7 text-white">
             {{ match.owner.kills }} / 
@@ -79,7 +80,7 @@
 
         <v-divider vertical class="ml-15" :style="winLabel.verticalStyle"></v-divider>     
 
-        <!-- KillInvolvementArea -->
+        <!-- owner-killInvolvementArea -->
         <div class="ml-1">
           <div class="kill-involvementArea"> 킬관여 {{ killInvolvementArea }} % </div>
           <div class="owner-wards"> 제어 와드 {{ match.owner.detectorWardsPlaced }} </div>
@@ -90,8 +91,8 @@
       </div>
         
 
-      <!-- ItemsArea -->
-      <div class="owner-items-icons mt-2 ml-2">
+      <!-- owner-item -->
+      <div class="mt-2 ml-2 d-flex">
         <div 
           v-for="(itemUrl, i) in ownerItemIconUrls"
           :key="i"
@@ -109,21 +110,23 @@
           <div v-else class="empty-item" :style="winLabel.emptyItemStyle"></div>
         </div>     
 
+        <!-- owner-multikill -->
         <span v-if="multikill" class="multikill">
           {{ multikill }}
-        </span>        
+        </span> 
+        
       </div>
     </div>
 
 
-    <!-- MatchEntries -->
-    <div class="entries d-flex" >
-      <div class="match-entries">
+    <!-- entries-simple -->
+    <div class="d-flex" >
+      <div class="entries-simple">
         <div 
           class="match-entry"
            v-for="(entry, i) in matchEntries.slice(0, 5)"
           :key="i"
-          @click="pushEntry(entry.name)"
+          @click="pushEntry(entry.summonerName)"
         >
           <v-avatar 
             rounded="md" 
@@ -131,18 +134,18 @@
           >
             <v-img :src="entry.url"></v-img>                        
           </v-avatar>
-          <span class="match-entry-name" :style="myNameBoldStyle(entry.name)">
+          <span class="match-entry-name" :style="myNameBoldStyle(entry.summonerName)">
             {{ entry.summonerName }}
           </span>
         </div>
       </div>
 
-      <div class="match-entries">
+      <div class="entries-simple">
         <div 
           class="match-entry"
            v-for="(entry, i) in matchEntries.slice(5, 10)"
           :key="i"
-          @click="pushEntry(entry.name)"
+          @click="pushEntry(entry.summonerName)"
         >
           <v-avatar 
             rounded="md" 
@@ -150,31 +153,31 @@
           >
             <v-img :src="entry.url"></v-img>                        
           </v-avatar>
-          <span class="match-entry-name" :style="myNameBoldStyle(entry.name)">
+          <span class="match-entry-name" :style="myNameBoldStyle(entry.summonerName)">
             {{ entry.summonerName }}
           </span>
         </div>
       </div>
     </div>
 
-    <!-- SeeMoreButton -->
+    <!-- entries-detail-button -->
     <div 
-      @click="seeMoreExpand = !seeMoreExpand"
+      @click="detailExpand = !detailExpand"
       :style="winLabel.foldStyle" :class="[foldClass, match.owner.win ? 'fold-win' : 'fold-loss']">
       <v-icon :color="match.owner.win ? '#5383e8' : '#d94055'">
-         {{ seeMoreExpand ? 'mdi-rotate-180 ' : '' }}mdi-chevron-down
+         {{ detailExpand ? 'mdi-rotate-180 ' : '' }}mdi-chevron-down
       </v-icon>
     </div>  
 
   </v-sheet>  
 
 
-  <!-- SeeMore -->
+  <!-- entries-detail -->
 
-  <!-- MatchLink -->
+  <!-- match-link -->
   <v-sheet
     class="match-link d-flex align-center"
-    v-if="seeMoreExpand"
+    v-if="detailExpand"
     color="subcontent"
     :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
     :height="contentSize.SUMMONER_TOTAL_MATCH_SEEMORE_LINK_HEIGHT"
@@ -188,12 +191,12 @@
     </button>
   </v-sheet>
 
-  <!-- MatchSeeMoreMenus -->
+  <!-- entries-detail-menu -->
   <v-sheet
     class="matches d-flex justify-space-between align-center"
-    v-if="seeMoreExpand"
+    v-if="detailExpand"
     color="subcontent"
-    :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
+    :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH"
     :height="contentSize.SUMMONER_TOTAL_MATCH_SEEMORE_FILTER_HEIGHT"
   >
     <v-btn                          
@@ -211,38 +214,71 @@
     </v-btn>    
   </v-sheet>
 
-  <!-- SeeMoreContent -->
+  <!-- entries-detail -->
   <v-sheet
     class="matches"
-    v-if="seeMoreExpand"
+    v-if="detailExpand"
     :color="match.owner.win ? '#28344E' : '#59343B'"
     :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH"     
   >
-
-    <!-- PlayerEntries -->
-    <template v-for="(team, i) in orderedMatchEntries[0]" :key="i">
+    
+    <template v-for="(team, i) in orderedMatchEntries[0]" :key="i">      
+      <v-sheet       
+        v-if="i === 1"
+        :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
+        height="60"
+      ></v-sheet>
+      
+      <!-- entries-label- -->
       <v-sheet 
         color="subcontent"
         :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
         height="30"
-      >         
+      >            
+        <div class="d-flex entry-label">
+          <div v-if="i === 0" style="width: 90px" class="ml-1">
+            {{ winText }} ({{ teams }})
+          </div>
+          <div v-else style="width: 90px" class="ml-1">
+            {{ winText === '승리' ? '패배' : '승리'}} ({{ teams === '레드팀' ? '블루팀' : '레드팀' }})
+          </div>
+
+          <div v-if="gameMode === '일반'" style="width: 160px">OP Score</div>
+          <div v-else style="width: 160px"></div>
+          
+          <div style="width: 115px">KDA</div>
+          <div style="width: 125px">피해량</div>          
+          <div style="width: 90px">와드</div>
+          <div style="width: 40px">cs</div>
+          <div style="width: 130px">아이템</div>
+        </div>
+
       </v-sheet>
+      
+      <!-- entry -->
       <v-sheet                 
         v-for="(entry, j) in team"
         :key="j"                
-        min-height="36"
+        max-height="40"
         class=' d-flex align-center pt-1 pb-1'
         :color="entry.summonerName === route.params.name ? orderedMatchEntries[1][2] : orderedMatchEntries[1][i]"
       >        
-        <v-avatar 
-          rounded="md" 
-          :size="35"
-          class="ml-2 mr-1"
-        >
-          <v-img :src="entry.url"></v-img>                        
-        </v-avatar>    
+
+        <!-- entry-icon -->
+        <div>
+          <v-avatar 
+            rounded="md" 
+            :size="35"
+            class="ml-2 mr-1"            
+          >
+            <v-img :src="entry.url"></v-img>                        
+            <v-avatar class="entry-level">
+              {{ entry.champLevel }}
+            </v-avatar>
+          </v-avatar>    
+        </div>
     
-        <!-- spell, rune -->
+        <!-- entry-spell -->
         <div>
           <div
             v-for="(url, k) in entry.spellIconUrls"
@@ -252,6 +288,8 @@
           </div>
         </div>
 
+
+        <!-- entry-rune -->
         <div>
           <div
             v-for="(url, k) in entry.runeIconUrls"
@@ -264,12 +302,14 @@
           </div>
         </div>
 
+        <!-- entry-summonerName -->
         <div 
           @click="pushEntry(entry.summonerName)"
-          class="match-entry-name match-entry-name-seemore ml-1" :style="myNameBoldStyle(entry.name)">
+          class="match-entry-name match-entry-name-seemore ml-1" :style="myNameBoldStyle(entry.summonerName)">
           {{ entry.summonerName }}
         </div>
-        
+
+        <!-- entry-opScore -->
         <template v-if="gameMode === '일반'">
           <div class="match-entry-seemore-opScore">
             {{ entry.opScore }}
@@ -284,45 +324,74 @@
             </div> 
           </div>
         </template>
+
         <div v-else class="match-entry-seemore-opScore-empty"></div>
 
-        <div style="text-align: center">
-          <div class="match-entry-seemore-kda">
+        <!-- entry-kda -->
+        <div style="text-align: center" class="match-entry-seemore-kda-score">
+          <div class="match-entry-seemore-kda mt-1">
             {{ entry.kills }}/{{ entry.deaths}}/{{ entry.assists }} ({{ entry.killInvolvementArea }}%)
           </div>
-          <div :style="[selectScoreFontStyle(entry.score), {'font-weight': 'bold', 'font-size': '14px', 'opacity': '1'}]">
+          <div :style="[selectScoreFontStyle(entry.score), {'font-weight': '600', 'font-size': '14px', 'opacity': '1'}]">
             {{ entry.score }}
           </div>
         </div>
-          
-        <!-- <div>
-           /// {{ entry.totalDamageDealtToChampions }} ////// {{ entry.totalDamageTaken }}
+
+        <!-- entry-damage -->
+        <div class="text-align match-entry-damage">
+          <div class="match-entry-font-grey mr-1">
+            {{ entry.totalDamageDealtToChampions.toLocaleString() }}
+          </div>
+          <div class="damage-bar-base">
+            <div :style="damageStyle(entry.damageWidth)"></div>            
+          </div>
+        </div>
+        
+        <div class="text-align ml-2 match-entry-damage">
+          <div class="match-entry-font-grey mr-1">
+            {{ entry.totalDamageTaken.toLocaleString() }}
+          </div>
+          <div class="damage-bar-base">
+            <div :style="damagedStyle(entry.damagedWidth)"></div>
+          </div>
         </div>
 
-        <div class="ml-1">
-          /// {{ entry.visionWardsBoughtInGame }} ////// {{ entry.wardsKilled}} // {{entry.wardsPlaced}}
-        </div> -->
-
-        <!-- <img :src="url" alt="" v-for="(url, i) in entry.itemUrls" :key="i"> -->      
+        <!-- entry-ward -->
+        <div class="text-align ml-2 match-entry-ward">
+          <div class="match-entry-font-grey">
+            {{ entry.visionWardsBoughtInGame }}
+          </div>
+          <div class="match-entry-font-grey">
+            {{ entry.wardsKilled }} / {{ entry.wardsPlaced }}
+          </div>          
+        </div>
+        
+        <!-- entry-cs -->
+        <div class="text-align ml-2 match-entry-ward">
+          <div class="match-entry-font-grey">
+            {{ entry.totalMinionsKilled }}
+          </div>
+          <div class="match-entry-font-grey">
+            분당 {{ entry.csPerMin }}
+          </div>          
+        </div>
+          
+        <!-- entry-items -->
+        <div class="ml-3 d-flex">
+          <div
+            v-for="(url, i) in entry.itemUrls" 
+            :key="i"
+          >
+            <img v-if="url" :src="url" alt="" class="match-entry-items mt-1">            
+            <div 
+              v-else class="match-entry-items empty-item"
+            ></div>            
+          </div>
+         </div>  
       </v-sheet>
-
-      <v-sheet v-if="i === 0">
-      </v-sheet>
-
+  
     </template>
-
-    <v-sheet       
-      :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
-      height="50"
-    >  
-    </v-sheet>
-    <v-sheet 
-      color="subcontent"
-      :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
-      height="30"
-    >  
-
-    </v-sheet>
+    
   </v-sheet>
 
 </template>
@@ -350,7 +419,7 @@ export default {
 
     const { contentSize, funcs, urlConfig, searchStore } = useSizeSetup()    
 
-    const seeMoreExpand = ref(false)
+    const detailExpand = ref(false)
     const copyLinkText = ref('Copy Link')
     const matchLink = ref('https://www.op.gg/summoners/kr/%EB%85%B9%EC%84%A0%EB%A9%80/matches/KgLASefpaoC8nMu0qdN7T43ZjUUaljhiqiD4dAfWR0A%3D/1656168003000')
 
@@ -472,6 +541,8 @@ export default {
     const killInvolvementArea = computed(() => createkillInvolvementArea(props.match.owner))
     const csPerMin = computed(() => createCsPerMin(props.match.owner))
     const averageTier = computed(() => {})
+    const winText = computed(() => props.match.owner.win ? '승리' : '패배')
+    const teams = computed(() => props.match.teams.find(team => team.win).teamId === 100 ? '레드팀' : '블루팀')
 
     // entry
     const matchEntries = computed(() =>  createMatchEntries(props.match.participants))
@@ -488,7 +559,7 @@ export default {
       ? [[one, two], color]
       : [[two, one], color]      
     })
-
+    
     function pushEntry(payload) {
       router.push(`/summoner/${payload}`)
       searchStore.searchContent(payload)
@@ -526,13 +597,16 @@ export default {
         return `${score.rank}${suffix}`
       })
 
+      const damageCanvasWidth =  caculateDamageCanvasWidth(entries.map(entry => entry.totalDamageDealtToChampions))
+      const damagedCanvasWidth = caculateDamageCanvasWidth(entries.map(entry => entry.totalDamageTaken))
+      
       return entries.map((participant, i) => {
         const {summonerName, kills, deaths, assists, totalDamageDealtToChampions, totalDamageTaken, visionWardsBoughtInGame, 
-          wardsKilled, wardsPlaced,  } = participant
-        
+          wardsKilled, wardsPlaced, totalMinionsKilled, champLevel } = participant
+              
         return {
           summonerName, kills, deaths, assists, totalDamageDealtToChampions, totalDamageTaken, visionWardsBoughtInGame, 
-          wardsKilled, wardsPlaced,
+          wardsKilled, wardsPlaced, totalMinionsKilled, champLevel,
           ranking: stringRankWithOpScores[i],
           opScore: opScores[i].score,
           spellIconUrls: createSpellUrls({
@@ -543,7 +617,9 @@ export default {
           runeIconUrls: createRuneUrls(participant.perks),
           killInvolvementArea: createkillInvolvementArea(participant),
           csPerMin: createCsPerMin(participant),
-          itemUrls: createItemIconUrls(participant),
+          itemUrls: createItemIconUrls(participant),                    
+          damageWidth: damageCanvasWidth[i],
+          damagedWidth: damagedCanvasWidth[i],
           url: `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${championImageName[i]}`,          
         }
       })
@@ -557,13 +633,15 @@ export default {
     }
 
     function createRuneUrls(perks) {
-      const runeId = perks.styles[0].selections[0].perk
+      const runeId = perks.styles[0].selections[0].perk      
       const mainId = perks.styles[0].style
       const mainObj =  runeJSON.find(mainRune => mainRune.id === mainId)
+      const subObj = runeJSON.find(subRune => subRune.id === perks.styles[1].style)
 
       const runeObj = mainObj?.slots[0].runes.find(rune => rune.id === runeId)
 
-      return [`${urlConfig.imgUrl}/img/${runeObj.icon}`, `${urlConfig.imgUrl}/img/${mainObj.icon}`]
+
+      return [`${urlConfig.imgUrl}/img/${runeObj.icon}`, `${urlConfig.imgUrl}/img/${subObj.icon}`]
     }
 
     function createOpScores(entries) {      
@@ -580,11 +658,17 @@ export default {
       return opScores.map((score, i) => ({score, rank: ranks[i]}))
     }
 
+    function caculateDamageCanvasWidth(damages) {
+      const WIDTH_SCALE = 55      
+      const maxDamage = Math.max(...damages)            
+      return damages.map(damage => (WIDTH_SCALE / maxDamage * damage).toFixed())
+    }
+
     const entriesItemIconUrls = computed(() => props.match.matchEntries.map(matchEntries => matchEntries.itemsUrls))
     const createItemIconUrls = entry => entry.itemUrls.map(item => `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/item/${item}.png`)
     const createScore = entry => !entry.deaths ? 'Perfect' : ((entry.kills + entry.assists) / entry.deaths).toFixed(2) + ':1'
     const createkillInvolvementArea = entry =>  !(entry.kills + entry.assists) ? 0 : Math.ceil(entry.kills + entry.assists / props.match.totalKills * 100)    
-    const createCsPerMin = entry => parseFloat((entry.totalMinionsKilled / Number(duration.value[0])).toFixed(1))
+    const createCsPerMin = entry => (entry.totalMinionsKilled / Number(duration.value[0])).toFixed(1)
     const selectScoreFontStyle = score => {
       if(score === 'Perfect') return {'color': '#eb663a'}
 
@@ -595,27 +679,52 @@ export default {
 
       return {'color': '#eb663a'}
     }
+
+    const damageStyle = width => ({      
+      'background-color': '#e84057',
+      'width': `${width}px`,
+      'height': '6.5px'
+    })
+
+    const damagedStyle = width => ({      
+      'background-color': '#7b7a8e',
+      'width': `${width}px`,
+      'height': '6.5px'
+    })
               
     onMounted(() => {
-      console.log(props.match.participants)
+      
     })
 
     return {
+      // setup
       contentSize,     
       route,
        
-      // css style obj
+      // css style, class obj
       winLabel,
       overrideFontStyle,
       defaultFontStyle,
       foldClass,
       selectScoreFontStyle,
+      damageStyle,
+      damagedStyle,
+      
+      //owner
+      ownerChampionIconUrl,
+      ownerItemIconUrls,
+      ownerSpellIconUrls,
+      ownerRuneIconUrls,
 
       // computed values
       gameMode,
       duration,
       timesAgo,
       score,      
+      winText,
+      
+      teams,
+
       // computed values - iconUrls
       ownerChampionIconUrl,
       ownerItemIconUrls,
@@ -632,8 +741,8 @@ export default {
       matchLink,
       createRuneUrls,
 
-      // seeMore
-      seeMoreExpand,
+      // detail
+      detailExpand,
       viewSelectToggleButtons,
       copyLinkText,
       copyLink: () => navigator.clipboard.writeText(matchLink.value).then(() => copyLinkText.value = 'Copied'),
@@ -652,7 +761,7 @@ export default {
   overflow: hidden;  
 }
 
-.gameType {
+.game-type {
   min-width: 130px;
 }
 
@@ -680,9 +789,6 @@ export default {
   
 }
 
-.owner-items-icons {
-  display: flex;
-}
 
 .champion-kda {
   display: flex;
@@ -762,7 +868,7 @@ export default {
   max-width: 100px;
 }
 
-.match-entries {
+.entries-simple {
   font-size: 13px;
   color: #9E9EB1;
   max-width: 100px;  
@@ -849,9 +955,15 @@ export default {
   min-width: 24%;
 }
 
-
 .seemore-entry {
-  min-height: 39px;  
+  max-height: 35px;  
+}
+
+.entry-label {
+  color: #7b7a8e;   
+  font-size: 14px;  
+  text-align: end;      
+  line-height: 30px;
 }
 
 #entry-spell {  
@@ -861,6 +973,19 @@ export default {
   flex-direction: column;
   width: 16px;
   height: 16px;
+}
+
+.entry-level {    
+  position: absolute;
+  max-width: 17px;
+  max-height: 17px;
+  color: white;
+  left: 0%;
+  bottom: 0%;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: #202D37;
+  opacity: 1;  
 }
 
 #entry-rune {
@@ -887,6 +1012,7 @@ export default {
 .match-entry-seemore-opScore {
   font-weight: bold;
   font-style: italic;
+  font-size: 14px;
   max-width: 3%;
   flex-grow: 1;
   text-align: center;
@@ -929,10 +1055,43 @@ export default {
   border-radius: 15px;
 }
 
+.match-entry-seemore-kda-score {
+  min-width: 110px;
+}
+
 .match-entry-seemore-kda {
   opacity: .7;
   font-size: 12px;  
   text-align: center;
+  min-width: 80px;
+}
+
+.match-entry-font-grey {
+  opacity: .7;
+  font-weight: 400;
+  font-size: 12px;  
+  text-align: center;  
+}
+
+.damage-bar-base {
+  width: 55px;
+  height: 6.5px;
+  background-color: #31313c;
+  margin-bottom: 5px;
+}
+
+.match-entry-damage {
+  min-width: 60px;
+}
+
+.match-entry-ward {
+  min-width: 40px;
+}
+
+.match-entry-items {
+  max-height: 22px;
+  margin-left: 1px;
+  /* flex-grow: 1; */
 }
 
 

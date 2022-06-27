@@ -9,7 +9,7 @@ const API_KEYS = [
   'RGAPI-8d145ff2-f5f3-43ad-9e38-0232dc06690f'
 ]
 
-const REQUEST_COUNT = 10
+const REQUEST_COUNT = 19
 
 const HEADER = {
   headers: {
@@ -38,13 +38,15 @@ export const useSearchStore = defineStore('search', {
       this.userInfoLoaded = true
       this.isRankGame = false
             
-      //
-      const idRes = await axios.get(`${urlConfig.baseUrl}/lol/summoner/v4/summoners/by-name/${name}?api_key=${API_KEY}`)
+      const encodedName = encodeURI(name)
+      const idRes = await axios.get(`${urlConfig.baseUrl}/lol/summoner/v4/summoners/by-name/${encodedName}?api_key=${API_KEY}`)
       const { accountId, summonerLevel, profileIconId, id, revisionDate, puuid } = idRes.data
+      console.log(id)
 
       // get league entries in all queues for a given summoner ID
-      const leagueRes = await axios.get(`${urlConfig.baseUrl}/lol/league/v4/entries/by-summoner/${id}?api_key=${API_KEY}`)
-      const { queueType, rank, tier, leaguePoints, wins, losses } = leagueRes?.data[0]
+      let leagueRes = await axios.get(`${urlConfig.baseUrl}/lol/league/v4/entries/by-summoner/${id}?api_key=${API_KEY}`)
+      
+      const { queueType, rank, tier, leaguePoints, wins, losses } = leagueRes.data[0]
       
       if (queueType === 'RANKED_SOLO_5x5') this.isRankGame = true
       
@@ -66,14 +68,15 @@ export const useSearchStore = defineStore('search', {
           const owner = participants.find(participant => participant.summonerName === name)          
           
           const totalKills = teams.find(team => team.teamId == owner.teamId).objectives.champion.kills
-                              
-                  
+
+                                                          
           return { 
             gameMode,
             gameDuration,  
             gameEndTimestamp,    
             totalKills,     
             participants,   
+            teams,
 
             owner
           }
