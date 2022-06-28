@@ -51,15 +51,7 @@
   </v-sheet>  
 
   <!-- RecentMatchesDashboard -->
-  <v-sheet 
-    class="recent-matches"
-    color="subcontent"
-    :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH"    
-    :height="contentSize.SUMMONER_TOTAL_MATCHES_RECENT_HEIGHT"                
-    elevation="0"
-  >
-    
-  </v-sheet>  
+  <summoner-matches-record />
 
   <!-- RecentMatches -->
   <summoner-match 
@@ -74,10 +66,12 @@
 <script>
 import useSizeSetup from '@/tools/SizeSetup.vue'
 import SummonerMatch from '@/components/SummonerMatch.vue'
+import SummonerMatchesRecord from '@/components/SummonerMatchesRecord.vue'
 
 export default {
   components: {
-    SummonerMatch
+    SummonerMatch,
+    SummonerMatchesRecord
   },
   setup() {
     const { contentSize, searchStore } = useSizeSetup()
@@ -127,13 +121,6 @@ export default {
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
   
-}
-
-.recent-matches {
-  margin-top: 3px;
-  margin-bottom: 7px;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
 }
 
 .matches {

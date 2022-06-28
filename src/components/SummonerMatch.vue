@@ -223,11 +223,50 @@
   >
     
     <template v-for="(team, i) in orderedMatchEntries[0]" :key="i">      
+
+      <!-- team-simple -->
       <v-sheet       
+        class="d-flex align-center justify-space-between"
         v-if="i === 1"
         :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
         height="60"
-      ></v-sheet>
+      >
+
+        <div class="ml-5 team-simple-object">          
+          <template v-for="(obj, i) in teamsInfo.firstTeam" :key="i">
+            <img class="team-simple-object-img" :src="obj.img"> 
+            <span class="ml-1 mr-2 mb-2"> {{ obj.text }} </span>
+          </template>
+        </div>
+
+        <div class="team-simple-stat">          
+          <div class="d-flex">
+            <div :style="teamKillStyle[0]"> </div>
+            <div :style="teamKillStyle[1]"></div>
+            <div class="team-simple-stat-text d-flex justify-space-between">              
+              <div> {{ totalKills.firstTeamTotalKill }}</div>
+              <div> Total Kill</div>
+              <div> {{ totalKills.secondTeamTotalKill }}</div>
+            </div>
+          </div>
+          <div class="d-flex mt-2">
+            <div :style="teamGoldStyle[0]"> </div>
+            <div :style="teamGoldStyle[1]"></div>
+            <div class="team-simple-stat-text d-flex justify-space-between">              
+              <div> {{ totalGolds.firstTeamGoldEarned.toLocaleString() }}</div>
+              <div> Total Gold</div>
+              <div> {{ totalGolds.secondTeamGoldEarned.toLocaleString() }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mr-5 team-simple-object">
+          <template v-for="(obj, i) in teamsInfo.secondTeam" :key="i">
+            <img class="team-simple-object-img" :src="obj.img"> 
+            <span class="ml-1 mr-2 mb-2"> {{ obj.text }} </span>
+          </template>          
+        </div>        
+      </v-sheet>
       
       <!-- entries-label- -->
       <v-sheet 
@@ -237,10 +276,13 @@
       >            
         <div class="d-flex entry-label">
           <div v-if="i === 0" style="width: 90px" class="ml-1">
-            {{ winText }} ({{ teams }})
+            <span :style="winTextStyle(winText, i)">{{ winText }}</span>
+            <span>({{ teamsText }})</span>
           </div>
+
           <div v-else style="width: 90px" class="ml-1">
-            {{ winText === '승리' ? '패배' : '승리'}} ({{ teams === '레드팀' ? '블루팀' : '레드팀' }})
+            <span :style="winTextStyle(winText, i)">{{ winText === '승리' ? '패배' : '승리'}}</span>
+            <span>({{ teamsText === '레드팀' ? '블루팀' : '레드팀' }})</span>
           </div>
 
           <div v-if="gameMode === '일반'" style="width: 160px">OP Score</div>
@@ -248,8 +290,8 @@
           
           <div style="width: 115px">KDA</div>
           <div style="width: 125px">피해량</div>          
-          <div style="width: 90px">와드</div>
-          <div style="width: 40px">cs</div>
+          <div style="width: 85px">와드</div>
+          <div style="width: 43px">cs</div>
           <div style="width: 130px">아이템</div>
         </div>
 
@@ -422,6 +464,8 @@ export default {
     const detailExpand = ref(false)
     const copyLinkText = ref('Copy Link')
     const matchLink = ref('https://www.op.gg/summoners/kr/%EB%85%B9%EC%84%A0%EB%A9%80/matches/KgLASefpaoC8nMu0qdN7T43ZjUUaljhiqiD4dAfWR0A%3D/1656168003000')
+    const TEAM_BAR_GRAPH_SCALE = 490
+    const WIDTH_SCALE = 55
 
     const gameModeMap = new Map([['CLASSIC', '일반'], ['ARAM', '무작위 총력전']])   
 
@@ -542,7 +586,131 @@ export default {
     const csPerMin = computed(() => createCsPerMin(props.match.owner))
     const averageTier = computed(() => {})
     const winText = computed(() => props.match.owner.win ? '승리' : '패배')
-    const teams = computed(() => props.match.teams.find(team => team.win).teamId === 100 ? '레드팀' : '블루팀')
+    const teamsText = computed(() => props.match.teams.find(team => team.win).teamId === 100 ? '레드팀' : '블루팀')    
+    const teamsInfo = computed(() => {
+      const firstTeam = props.match.teams.find(team => team.win === props.match.owner.win)
+      const secondTeam = props.match.teams.find(team => team.win !== props.match.owner.win)
+
+      if (firstTeam.teamId === 100) {
+        firstTeam.imgId = '-r',
+        secondTeam.imgId = ''
+      }
+
+      else {
+        firstTeam.imgId = '',
+        secondTeam.imgId = '-r'
+      }
+
+      return {
+        firstTeam: [
+          {
+            img: `../../public/icon-baron${firstTeam.imgId}.svg`,
+            text: firstTeam.objectives.baron.kills,
+          },
+          {
+            img: `../../public/icon-dragon${firstTeam.imgId}.svg`,
+            text: firstTeam.objectives.dragon.kills
+          },
+          {
+            img: `../../public/icon-tower${firstTeam.imgId}.svg`,
+            text: firstTeam.objectives.tower.kills
+          }            
+        ],          
+        secondTeam: [
+          {
+            img: `../../public/icon-baron${secondTeam.imgId}.svg`,
+            text: secondTeam.objectives.baron.kills,
+          },
+          {
+            img: `../../public/icon-dragon${secondTeam.imgId}.svg`,
+            text: secondTeam.objectives.dragon.kills
+          },
+          {
+            img: `../../public/icon-tower${secondTeam.imgId}.svg`,
+            text: secondTeam.objectives.tower.kills
+          }
+        ]
+      }
+    })
+
+    const totalKills = computed(() => {
+      const { firstTeam, secondTeam } = findTeam()
+      return {
+        firstTeamTotalKill: firstTeam.objectives.champion.kills,
+        secondTeamTotalKill: secondTeam.objectives.champion.kills
+      }
+    })
+
+    const totalGolds = computed(() => {
+      const [one, two] = orderedMatchEntries.value[0]
+
+      return {
+        firstTeamGoldEarned: one.map(participant => participant.goldEarned).reduce((acc, cur, i) => acc + cur),
+        secondTeamGoldEarned: two.map(participant => participant.goldEarned).reduce((acc, cur, i) => acc + cur)
+      }
+    })
+    
+
+    const teamKillStyle = computed(() => {
+      const { firstTeamTotalKill, secondTeamTotalKill } = totalKills.value
+      let firstColor
+      let secondColor
+
+      if(!props.match.owner.win) {
+        firstColor = '#e84057'
+        secondColor = '#5383e8'
+      } else {
+        firstColor = '#5383e8' 
+        secondColor = '#e84057'
+      }
+
+      return [
+        {
+          'background-color': firstColor,
+          'width': (TEAM_BAR_GRAPH_SCALE / (firstTeamTotalKill + secondTeamTotalKill) * firstTeamTotalKill) + 'px',
+          'height': '16px'
+        },
+        {
+          'background-color': secondColor,
+          'width': (TEAM_BAR_GRAPH_SCALE / (firstTeamTotalKill + secondTeamTotalKill) * secondTeamTotalKill) + 'px',
+          'height': '16px'
+        }
+      ]
+    })
+
+    const teamGoldStyle = computed(() => {
+      const { firstTeamGoldEarned, secondTeamGoldEarned } = totalGolds.value
+
+      let firstColor
+      let secondColor
+
+      if(!props.match.owner.win) {
+        firstColor = '#e84057'
+        secondColor = '#5383e8'
+      } else {
+        firstColor = '#5383e8' 
+        secondColor = '#e84057'
+      }
+
+      return [
+        {
+          'background-color': firstColor,
+          'width': (TEAM_BAR_GRAPH_SCALE / (firstTeamGoldEarned + secondTeamGoldEarned) * firstTeamGoldEarned) + 'px',
+          'height': '16px'
+        },
+        {
+          'background-color': secondColor,
+          'width': (TEAM_BAR_GRAPH_SCALE / (firstTeamGoldEarned + secondTeamGoldEarned) * secondTeamGoldEarned) + 'px',
+          'height': '16px'
+        }        
+      ]
+
+    })
+
+    const findTeam = () => ({
+      firstTeam: props.match.teams.find(team => team.win === props.match.owner.win),
+      secondTeam: props.match.teams.find(team => team.win !== props.match.owner.win)
+    })
 
     // entry
     const matchEntries = computed(() =>  createMatchEntries(props.match.participants))
@@ -602,11 +770,11 @@ export default {
       
       return entries.map((participant, i) => {
         const {summonerName, kills, deaths, assists, totalDamageDealtToChampions, totalDamageTaken, visionWardsBoughtInGame, 
-          wardsKilled, wardsPlaced, totalMinionsKilled, champLevel } = participant
+          wardsKilled, wardsPlaced, totalMinionsKilled, champLevel, goldEarned } = participant          
               
         return {
           summonerName, kills, deaths, assists, totalDamageDealtToChampions, totalDamageTaken, visionWardsBoughtInGame, 
-          wardsKilled, wardsPlaced, totalMinionsKilled, champLevel,
+          wardsKilled, wardsPlaced, totalMinionsKilled, champLevel, goldEarned,
           ranking: stringRankWithOpScores[i],
           opScore: opScores[i].score,
           spellIconUrls: createSpellUrls({
@@ -658,8 +826,7 @@ export default {
       return opScores.map((score, i) => ({score, rank: ranks[i]}))
     }
 
-    function caculateDamageCanvasWidth(damages) {
-      const WIDTH_SCALE = 55      
+    function caculateDamageCanvasWidth(damages) {            
       const maxDamage = Math.max(...damages)            
       return damages.map(damage => (WIDTH_SCALE / maxDamage * damage).toFixed())
     }
@@ -667,7 +834,7 @@ export default {
     const entriesItemIconUrls = computed(() => props.match.matchEntries.map(matchEntries => matchEntries.itemsUrls))
     const createItemIconUrls = entry => entry.itemUrls.map(item => `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/item/${item}.png`)
     const createScore = entry => !entry.deaths ? 'Perfect' : ((entry.kills + entry.assists) / entry.deaths).toFixed(2) + ':1'
-    const createkillInvolvementArea = entry =>  !(entry.kills + entry.assists) ? 0 : Math.ceil(entry.kills + entry.assists / props.match.totalKills * 100)    
+    const createkillInvolvementArea = entry => !(entry.kills + entry.assists) ? 0 : Math.ceil(entry.kills + entry.assists / props.match.totalKills * 100)        
     const createCsPerMin = entry => (entry.totalMinionsKilled / Number(duration.value[0])).toFixed(1)
     const selectScoreFontStyle = score => {
       if(score === 'Perfect') return {'color': '#eb663a'}
@@ -691,10 +858,14 @@ export default {
       'width': `${width}px`,
       'height': '6.5px'
     })
-              
-    onMounted(() => {
+
+    const winTextStyle = (win, i) => {
+      if (i === 0) return winLabel.value.fontStyle      
+      if (i === 1) return win === '승리' ? {'color': '#E83D46'} : {'color': '#5383E8'}         
       
-    })
+    }
+              
+    onMounted(() => {})
 
     return {
       // setup
@@ -708,7 +879,8 @@ export default {
       foldClass,
       selectScoreFontStyle,
       damageStyle,
-      damagedStyle,
+      damagedStyle,      
+      winTextStyle,
       
       //owner
       ownerChampionIconUrl,
@@ -723,7 +895,7 @@ export default {
       score,      
       winText,
       
-      teams,
+      teamsText,
 
       // computed values - iconUrls
       ownerChampionIconUrl,
@@ -746,6 +918,13 @@ export default {
       viewSelectToggleButtons,
       copyLinkText,
       copyLink: () => navigator.clipboard.writeText(matchLink.value).then(() => copyLinkText.value = 'Copied'),
+
+      // detail-team
+      teamsInfo,
+      teamKillStyle,
+      teamGoldStyle,
+      totalKills,
+      totalGolds,
 
       pushEntry,
       myNameBoldStyle: name => name === route.params.name ? {'color': 'white'} : '',
@@ -959,9 +1138,31 @@ export default {
   max-height: 35px;  
 }
 
+.team-simple-object {
+  color: #7b7a8e;   
+  font-size: 14px;        
+}
+
+.team-simple-object-img {
+  width: 14px;
+}
+
+.team-simple-stat {
+  width: 490px;
+  height: 40px;  
+}
+
+.team-simple-stat-text {
+  position: absolute;    
+  font-size: 10px;  
+  width: 490px;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
 .entry-label {
   color: #7b7a8e;   
-  font-size: 14px;  
+  font-size: 12px;  
   text-align: end;      
   line-height: 30px;
 }

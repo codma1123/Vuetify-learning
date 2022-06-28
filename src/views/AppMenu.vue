@@ -1,5 +1,7 @@
 <template>
   <v-app-bar
+    absolute
+    class="codma-app-bar"
     color="primary"
     elevation="0"
     :height="appMenuHeight + 10"
@@ -98,4 +100,10 @@ export default {
 .search {
   right: 13px; 
 }
+
+.codma-app-bar {
+  top: 0px;
+  margin-top: 0px;
+}
+
 </style>

@@ -1,5 +1,7 @@
 <template>
   <v-app-bar
+    absolute
+    class="codma-app-bar"
     color="secondary"    
     elevation="0"    
     :height="appBarHeight"    
@@ -58,4 +60,9 @@ export default {
 .sunddak {
   margin-left: -3px;
 }
+
+.codma-app-bar {  
+  
+}
+
 </style>

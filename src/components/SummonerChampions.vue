@@ -1,17 +1,14 @@
 <template>
-  <v-card height="1000" width="1000" color="white">
-
+  <v-card height="1000" width="1000" color="white" class=d-flex>
+    
   </v-card>
 </template>
 
 <script>
-import { onMounted } from 'vue'
 
 export default {  
-  setup() {
-    onMounted(() => {
-      console.log('ss')
-    })
+  setup() {  
+
   }
 }
 </script>
