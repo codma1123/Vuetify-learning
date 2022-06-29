@@ -44,8 +44,13 @@ function createIconUrl (iconUrl) {
   
 }
 
+function addArray () {
+  return this.reduce((acc, cur) => acc + cur)
+}
+
 export default {
   convertHMS,
   timeForToday,
-  betweenTime
+  betweenTime,
+  addArray
 }

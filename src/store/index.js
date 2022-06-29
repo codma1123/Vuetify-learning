@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-05d89c43-76bf-4ca0-b970-da19c4643d31'
+const API_KEY = 'RGAPI-fada49f3-96cc-47c2-80a3-f06dcd6aadaa'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
@@ -38,7 +38,7 @@ export const useSearchStore = defineStore('search', {
       this.userInfoLoaded = true
       this.isRankGame = false
             
-      const encodedName = encodeURI(name)
+      const encodedName = encodeURI(name.trim())
       const idRes = await axios.get(`${urlConfig.baseUrl}/lol/summoner/v4/summoners/by-name/${encodedName}?api_key=${API_KEY}`)
       const { accountId, summonerLevel, profileIconId, id, revisionDate, puuid } = idRes.data
       console.log(id)
