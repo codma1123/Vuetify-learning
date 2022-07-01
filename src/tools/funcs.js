@@ -48,9 +48,14 @@ function addArray () {
   return this.reduce((acc, cur) => acc + cur)
 }
 
+function meanArray (arr) {
+  return arr.reduce((acc, cur) => acc + Number(cur))
+}
+
 export default {
   convertHMS,
   timeForToday,
   betweenTime,
-  addArray
+  addArray,
+  meanArray
 }

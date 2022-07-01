@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-fada49f3-96cc-47c2-80a3-f06dcd6aadaa'
+const API_KEY = 'RGAPI-1b7750f6-ee5a-4b30-a43f-fbdc1a61d01e'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
