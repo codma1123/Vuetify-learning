@@ -9,7 +9,7 @@ const API_KEYS = [
   'RGAPI-8d145ff2-f5f3-43ad-9e38-0232dc06690f'
 ]
 
-const REQUEST_COUNT = 10
+const REQUEST_COUNT = 3
 
 const HEADER = {
   headers: {
@@ -41,12 +41,25 @@ export const useSearchStore = defineStore('search', {
       const encodedName = encodeURI(name.trim())
       const idRes = await axios.get(`${urlConfig.baseUrl}/lol/summoner/v4/summoners/by-name/${encodedName}?api_key=${API_KEY}`)
       const { accountId, summonerLevel, profileIconId, id, revisionDate, puuid } = idRes.data
-      console.log(id)
+      
 
       // get league entries in all queues for a given summoner ID
       let leagueRes = await axios.get(`${urlConfig.baseUrl}/lol/league/v4/entries/by-summoner/${id}?api_key=${API_KEY}`)
+      let queueType = 0
+      let rank = 0
+      let tier = 0
+      let leaguePoints = 0
+      let wins = 0
+      let losses = 0
       
-      const { queueType, rank, tier, leaguePoints, wins, losses } = leagueRes.data[0]
+      if(leagueRes.data[0]) {
+        queueType = leagueRes.data[0].queueType
+        rank = leagueRes.data[0].rank
+        tier = leagueRes.data[0].tier
+        leaguePoints = leagueRes.data[0].leaguePoints
+        wins = leagueRes.data[0].wins
+        losses = leagueRes.data[0].losses
+      }
       
       if (queueType === 'RANKED_SOLO_5x5') this.isRankGame = true
       

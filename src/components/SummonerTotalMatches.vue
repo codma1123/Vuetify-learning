@@ -15,7 +15,7 @@
         v-for="(button, i) in viewSelectToggleButtons"
         elevation="0"
         :color="button.activate ? '#515163' : 'subcontent'"         
-        exact
+        @click="onFilterClick(button.name)"
         :key="i"
       >
         <span :class="button.activate ? 'font-weight-bold' : ''">
@@ -100,8 +100,16 @@ export default {
       { title: '이벤트 게임' },
     ]
 
-    function onChange (event) {
-      const filter = menuItems[event.target.value].title
+    function onChange (event) {      
+      setFilter( menuItems[event.target.value].title)
+    }
+
+    function onFilterClick (name) {
+      setFilter(name)
+    }
+
+    function setFilter (name) {
+      
     }
     return {
       contentSize,
@@ -110,7 +118,8 @@ export default {
       viewSelectToggleButtons,
       menuItems,
 
-      onChange
+      onChange,
+      onFilterClick
     }
   }
 }
