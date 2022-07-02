@@ -33,6 +33,7 @@ function timeForToday(value) {
   return `${Math.floor(betweenTimeDay / 365)} 년 전`;
 }
 
+
 function betweenTime(value) {
   const today = new Date();
   const timeValue = new Date(value);

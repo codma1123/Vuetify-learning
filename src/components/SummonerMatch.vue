@@ -13,7 +13,16 @@
     <div class="game-type mt-2">
       <div :style="[winLabel.fontStyle, overrideFontStyle]" class="ml-2"> {{ gameMode }} </div>
       <div :style="defaultFontStyle">
-        <div> {{ timesAgo }}</div>
+        <div> 
+          {{ timesAgo }} 
+          <v-tooltip location="top" activator="parent" color="#fff" class="game-type__timesAgo_tooltip">
+            <div class="text-center game-type__timesAgo_tooltip__content">
+              {{ absoluteGameEndTime }} 
+            </div>
+            <div class="game-type__timesAgo_tooltip__triangle"></div>
+          </v-tooltip>
+
+        </div>
         <v-divider class="mt-2 mb-2" width="50"></v-divider>
         <div class="font-weight-bold"> {{ winText }}</div>
         <div> {{ duration[0] }}분 {{ duration[1] }}초 </div>        
@@ -446,6 +455,7 @@ import championJSON from '@/assets/championInfo.json'
 
 import KillChip from '../components/KillChip.vue'
 import { useRoute, useRouter } from 'vue-router'
+import moment from 'moment'
 
 export default {
   props: {
@@ -460,6 +470,7 @@ export default {
     const router = useRouter()
 
     const { contentSize, funcs, urlConfig, searchStore } = useSizeSetup()    
+    
 
     const detailExpand = ref(false)
     const copyLinkText = ref('Copy Link')
@@ -555,6 +566,11 @@ export default {
          default:
           return v           
       }      
+    })
+
+    const absoluteGameEndTime = computed(() => {
+      const m = moment(props.match.gameEndTimestamp)
+      return m.format('YYYY년 MM월 DD일 HH시 mm분')      
     })
 
     const multikill = computed(() => {      
@@ -892,6 +908,7 @@ export default {
       gameMode,
       duration,
       timesAgo,
+      absoluteGameEndTime,
       score,      
       winText,
       
@@ -942,6 +959,25 @@ export default {
 
 .game-type {
   min-width: 130px;
+}
+
+.game-type__timesAgo_tooltip {
+  left: -130px;  
+  height: 30px;
+}
+
+.game-type__timesAgo_tooltip__content {
+  letter-spacing: 1px;
+  font-size: 12px;
+}
+
+.game-type__timesAgo_tooltip__triangle {  
+  position: absolute;
+  left: 80px;
+  border-bottom: 15px solid transparent;
+  border-top: 15px solid black;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
 }
 
 .icons {
