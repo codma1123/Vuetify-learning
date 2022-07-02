@@ -8,8 +8,7 @@
       :height="contentSize.SUMMONER_TOTAL_MATCH_SEEMORE_FILTER_HEIGHT"
     >
       <v-btn                          
-        :class="['ml-1 mr-1 filter-menu', button.activate ? 'filter-active' : ''] "      
-        rounded="md"            
+        :class="['ml-1 mr-1 filter-menu analysis-filter', button.activate ? 'filter-active' : ''] "      
         v-for="(button, i) in btnMenus"
         elevation="0"
         :color="button.activate ? 'subcontent' : 'subcontent'"             
@@ -80,7 +79,11 @@ export default {
   border-bottom: 3px solid #5383e8;
 }
 
+.analysis-filter {
+  border-radius: 0px !important;
+}
+
 .contentss {  
-  margin-top: -7px;
+  margin-top: -9px;
 }
 </style>
