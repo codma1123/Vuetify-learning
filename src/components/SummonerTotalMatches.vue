@@ -15,11 +15,11 @@
         v-for="(button, i) in viewSelectToggleButtons"
         elevation="0"
         :color="button.activate ? '#515163' : 'subcontent'"         
-        @click="onFilterClick(button.name)"
+        @click="onFilterClick(button)"
         :key="i"
       >
         <span :class="button.activate ? 'font-weight-bold' : ''">
-          {{ button.name }}        
+          {{ button.title }}        
         </span>
       </v-btn>
       <v-btn
@@ -67,6 +67,7 @@
 import useSizeSetup from '@/tools/SizeSetup.vue'
 import SummonerMatch from '@/components/SummonerMatch.vue'
 import SummonerMatchesRecord from '@/components/SummonerMatchesRecord.vue'
+import { onMounted, ref } from 'vue'
 
 export default {
   components: {
@@ -75,42 +76,56 @@ export default {
   },
   setup() {
     const { contentSize, searchStore } = useSizeSetup()
+    const queueMap = new Map([
+      ['']
+    ])
 
-    const viewSelectToggleButtons = [
+    const viewSelectToggleButtons = ref([
       {
-        name: '전체',
+        title: '전체',
         activate: true,
+        type: 'ALL'
       },
       {
-        name: '솔로랭크',
+        title: '솔로랭크',
         activate: false,
       },
       {
-        name: '자유랭크',
+        title: '자유랭크',
         activate: false,
       }
-    ]
+    ])
 
     const menuItems = [
-      { title: '큐 타입' },
-      { title: '일반(비공개 선택)' },
-      { title: '무작위 총력전' },
-      { title: 'AI 상대 대전' },
-      { title: '격전' },
-      { title: '이벤트 게임' },
+      { title: '큐 타입', type: null },
+      { title: '일반(비공개 선택)', type: 'CLASSIC' },
+      { title: '무작위 총력전', type: 'ARAM' },
+      { title: 'AI 상대 대전', type: null },
+      { title: '격전', type: null },
+      { title: '이벤트 게임', type: null },
     ]
 
     function onChange (event) {      
-      setFilter( menuItems[event.target.value].title)
+      setFilter( menuItems[event.target.value])
     }
 
-    function onFilterClick (name) {
-      setFilter(name)
+    function onFilterClick (button) {      
+      viewSelectToggleButtons.value.forEach(btn => btn.activate = false)
+      button.activate = true
+      setFilter(button)
     }
 
-    function setFilter (name) {
+    function setFilter (queueType) {
+      if(menuItems.find(item => item.title === queueType.title)) viewSelectToggleButtons.value.forEach(button => button.activate = false)            
+      if(!queueType.type) return           
+
+      searchStore.filterMatches(queueType.type)
       
     }
+
+    onMounted(() => {
+      console.log(searchStore.matches)
+    })
     return {
       contentSize,
       searchStore,
@@ -119,8 +134,10 @@ export default {
       menuItems,
 
       onChange,
-      onFilterClick
+      onFilterClick,
     }
+
+    
   }
 }
 </script>

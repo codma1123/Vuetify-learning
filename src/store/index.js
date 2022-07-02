@@ -29,7 +29,8 @@ export const useSearchStore = defineStore('search', {
     iconCdnVersion: '',
     iconUrl: '',
     isRankGame: false,
-    tryLoad: false
+    tryLoad: false,
+    tempMatches: []
    }),  
   actions: {
 
@@ -120,14 +121,27 @@ export const useSearchStore = defineStore('search', {
       // done phase
       this.userInfoLoaded = false
       this.loadComplate = true
+      this.tempMatches = this.matches.slice()
 
+    },
+
+    filterMatches (type) {      
+      if(type == 'ALL') {
+        this.matches = this.tempMatches
+        return
+      }
+
+      this.matches = this.tempMatches.filter(match => match.gameMode === type)
     },
 
     async setupUserIconCDN() {
       const res = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json')
       this.iconCdnVersion = res.data[0]      
-      console.log(this.iconCdnVersion = res.data[0]      )      
-    }
+      console.log(this.iconCdnVersion = res.data[0])      
+    },
+
+    
+
   },
 
   updateState(payload) {
