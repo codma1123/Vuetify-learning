@@ -215,7 +215,8 @@
       elevation="0"
       :color="button.activate ? '#515163' : 'subcontent'"         
       exact
-      :key="i"      
+      :key="i"   
+      @click="selectDetailMenu(i)"   
     >
       <span :class="button.activate ? 'font-weight-bold' : ''">
         {{ button.name }}        
@@ -224,224 +225,241 @@
   </v-sheet>
 
   <!-- entries-detail -->
-  <v-sheet
+  <v-sheet    
     class="matches"
     v-if="detailExpand"
     :color="match.owner.win ? '#28344E' : '#59343B'"
     :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH"     
   >
+    <div v-if="viewSelectToggleButtons[0].activate">
+      <template v-for="(team, i) in orderedMatchEntries[0]" :key="i">      
+  
+        <!-- team-simple -->
+        <v-sheet       
+          class="d-flex align-center justify-space-between"
+          v-if="i === 1"
+          :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
+          height="60"
+        >
+  
+          <div class="ml-5 team-simple-object">          
+            <template v-for="(obj, i) in teamsInfo.firstTeam" :key="i">
+              <img class="team-simple-object-img" :src="obj.img"> 
+              <span class="ml-1 mr-2 mb-2"> {{ obj.text }} </span>
+            </template>
+          </div>
+  
+          <div class="team-simple-stat">          
+            <div class="d-flex">
+              <div :style="teamKillStyle[0]"> </div>
+              <div :style="teamKillStyle[1]"></div>
+              <div class="team-simple-stat-text d-flex justify-space-between">              
+                <div> {{ totalKills.firstTeamTotalKill }}</div>
+                <div> Total Kill </div>
+                <div> {{ totalKills.secondTeamTotalKill }}</div>
+              </div>
+            </div>
+            <div class="d-flex mt-2">
+              <div :style="teamGoldStyle[0]"> </div>
+              <div :style="teamGoldStyle[1]"></div>
+              <div class="team-simple-stat-text d-flex justify-space-between">              
+                <div> {{ totalGolds.firstTeamGoldEarned.toLocaleString() }}</div>
+                <div> Total Gold </div>
+                <div> {{ totalGolds.secondTeamGoldEarned.toLocaleString() }}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mr-5 team-simple-object">
+            <template v-for="(obj, i) in teamsInfo.secondTeam" :key="i">
+              <img class="team-simple-object-img" :src="obj.img"> 
+              <span class="ml-1 mr-2 mb-2"> {{ obj.text }} </span>
+            </template>          
+          </div>        
+        </v-sheet>
+        
+        <!-- entries-label- -->
+        <v-sheet 
+          color="subcontent"
+          :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
+          height="30"
+        >            
+          <div class="d-flex entry-label">
+            <div v-if="i === 0" style="width: 90px" class="ml-1">
+              <span :style="winTextStyle(winText, i)">{{ winText }}</span>
+              <span>({{ teamsText }})</span>
+            </div>
+  
+            <div v-else style="width: 90px" class="ml-1">
+              <span :style="winTextStyle(winText, i)">{{ winText === '승리' ? '패배' : '승리'}}</span>
+              <span class="ml-1">({{ teamsText === '레드팀' ? '블루팀' : '레드팀' }})</span>
+            </div>
+  
+            <div v-if="gameMode === '일반'" style="width: 160px">OP Score</div>
+            <div v-else style="width: 160px"></div>
+            
+            <div style="width: 115px">KDA</div>
+            <div style="width: 125px">피해량</div>          
+            <div style="width: 85px">와드</div>
+            <div style="width: 43px">cs</div>
+            <div style="width: 130px">아이템</div>
+          </div>
+  
+        </v-sheet>
+        
+        <!-- entry -->
+        <v-sheet                 
+          v-for="(entry, j) in team"
+          :key="j"                
+          max-height="40"
+          class=' d-flex align-center pt-1 pb-1'
+          :color="entry.summonerName === route.params.name ? orderedMatchEntries[1][2] : orderedMatchEntries[1][i]"
+        >        
+  
+          <!-- entry-icon -->
+          <div>
+            <v-avatar 
+              rounded="md" 
+              :size="35"
+              class="ml-2 mr-1"            
+            >
+              <v-img :src="entry.url"></v-img>                        
+              <v-avatar class="entry-level">
+                {{ entry.champLevel }}
+              </v-avatar>
+            </v-avatar>    
+          </div>
+      
+          <!-- entry-spell -->
+          <div>
+            <div
+              v-for="(url, k) in entry.spellIconUrls"
+              :key="k"
+            >
+              <img :src="url" id="entry-spell"/>
+            </div>
+          </div>
+  
+  
+          <!-- entry-rune -->
+          <div>
+            <div
+              v-for="(url, k) in entry.runeIconUrls"
+              :key="k"
+            >
+              <v-avatar v-if=" k===0" size="18" color="#000000" style="text-align: center">                      
+                <img :src="url" id="entry-rune--main"/>
+              </v-avatar> 
+              <img v-else :src="url" id="entry-rune" />
+            </div>
+          </div>
+  
+          <!-- entry-summonerName -->
+          <div 
+            @click="pushEntry(entry.summonerName)"
+            class="match-entry-name match-entry-name-seemore ml-1" :style="myNameBoldStyle(entry.summonerName)">
+            {{ entry.summonerName }}
+          </div>
+  
+          <!-- entry-opScore -->
+          <template v-if="gameMode === '일반'">
+            <div class="match-entry-seemore-opScore">
+              {{ entry.opScore }}
+            </div>
     
-    <template v-for="(team, i) in orderedMatchEntries[0]" :key="i">      
-
-      <!-- team-simple -->
-      <v-sheet       
-        class="d-flex align-center justify-space-between"
-        v-if="i === 1"
-        :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
-        height="60"
-      >
-
-        <div class="ml-5 team-simple-object">          
-          <template v-for="(obj, i) in teamsInfo.firstTeam" :key="i">
-            <img class="team-simple-object-img" :src="obj.img"> 
-            <span class="ml-1 mr-2 mb-2"> {{ obj.text }} </span>
+            <div class="match-entry-seemore-rank">
+              <div v-if="entry.ranking !== '1st' " class="match-entry-seemore-ranking">
+                {{ entry.ranking }}
+              </div> 
+              <div v-else class="match-entry-seemore-ranking match-entry-seemore-ranking--mvp">
+                MVP
+              </div> 
+            </div>
           </template>
-        </div>
-
-        <div class="team-simple-stat">          
-          <div class="d-flex">
-            <div :style="teamKillStyle[0]"> </div>
-            <div :style="teamKillStyle[1]"></div>
-            <div class="team-simple-stat-text d-flex justify-space-between">              
-              <div> {{ totalKills.firstTeamTotalKill }}</div>
-              <div> Total Kill</div>
-              <div> {{ totalKills.secondTeamTotalKill }}</div>
+  
+          <div v-else class="match-entry-seemore-opScore-empty"></div>
+  
+          <!-- entry-kda -->
+          <div style="text-align: center" class="match-entry-seemore-kda-score">
+            <div class="match-entry-seemore-kda mt-1">
+              {{ entry.kills }}/{{ entry.deaths}}/{{ entry.assists }} ({{ entry.killInvolvementArea }}%)
+            </div>
+            <div :style="[selectScoreFontStyle(entry.score), {'font-weight': '600', 'font-size': '14px', 'opacity': '1'}]">
+              {{ entry.score }}
             </div>
           </div>
-          <div class="d-flex mt-2">
-            <div :style="teamGoldStyle[0]"> </div>
-            <div :style="teamGoldStyle[1]"></div>
-            <div class="team-simple-stat-text d-flex justify-space-between">              
-              <div> {{ totalGolds.firstTeamGoldEarned.toLocaleString() }}</div>
-              <div> Total Gold</div>
-              <div> {{ totalGolds.secondTeamGoldEarned.toLocaleString() }}</div>
+  
+          <!-- entry-damage -->
+          <div class="text-align match-entry-damage">
+            <div class="match-entry-font-grey mr-1">
+              {{ entry.totalDamageDealtToChampions.toLocaleString() }}
+            </div>
+            <div class="damage-bar-base">
+              <div :style="damageStyle(entry.damageWidth)"></div>            
             </div>
           </div>
-        </div>
-        
-        <div class="mr-5 team-simple-object">
-          <template v-for="(obj, i) in teamsInfo.secondTeam" :key="i">
-            <img class="team-simple-object-img" :src="obj.img"> 
-            <span class="ml-1 mr-2 mb-2"> {{ obj.text }} </span>
-          </template>          
-        </div>        
-      </v-sheet>
-      
-      <!-- entries-label- -->
-      <v-sheet 
-        color="subcontent"
-        :width="contentSize.SUMMONER_TOTAL_MATCHES_WIDTH" 
-        height="30"
-      >            
-        <div class="d-flex entry-label">
-          <div v-if="i === 0" style="width: 90px" class="ml-1">
-            <span :style="winTextStyle(winText, i)">{{ winText }}</span>
-            <span>({{ teamsText }})</span>
-          </div>
-
-          <div v-else style="width: 90px" class="ml-1">
-            <span :style="winTextStyle(winText, i)">{{ winText === '승리' ? '패배' : '승리'}}</span>
-            <span>({{ teamsText === '레드팀' ? '블루팀' : '레드팀' }})</span>
-          </div>
-
-          <div v-if="gameMode === '일반'" style="width: 160px">OP Score</div>
-          <div v-else style="width: 160px"></div>
           
-          <div style="width: 115px">KDA</div>
-          <div style="width: 125px">피해량</div>          
-          <div style="width: 85px">와드</div>
-          <div style="width: 43px">cs</div>
-          <div style="width: 130px">아이템</div>
-        </div>
+          <div class="text-align ml-2 match-entry-damage">
+            <div class="match-entry-font-grey mr-1">
+              {{ entry.totalDamageTaken.toLocaleString() }}
+            </div>
+            <div class="damage-bar-base">
+              <div :style="damagedStyle(entry.damagedWidth)"></div>
+            </div>
+          </div>
+  
+          <!-- entry-ward -->
+          <div class="text-align ml-2 match-entry-ward">
+            <div class="match-entry-font-grey">
+              {{ entry.visionWardsBoughtInGame }}
+            </div>
+            <div class="match-entry-font-grey">
+              {{ entry.wardsKilled }} / {{ entry.wardsPlaced }}
+            </div>          
+          </div>
+          
+          <!-- entry-cs -->
+          <div class="text-align ml-2 match-entry-ward">
+            <div class="match-entry-font-grey">
+              {{ entry.totalMinionsKilled }}
+            </div>
+            <div class="match-entry-font-grey">
+              분당 {{ entry.csPerMin }}
+            </div>          
+          </div>
+            
+          <!-- entry-items -->
+          <div class="ml-3 d-flex">
+            <div
+              v-for="(url, i) in entry.itemUrls" 
+              :key="i"
+            >
+              <img v-if="url" :src="url" alt="" class="match-entry-items mt-1">            
+              <div 
+                v-else class="match-entry-items empty-item"
+              ></div>            
+            </div>
+           </div>  
+        </v-sheet>    
+      </template>
+    </div>
 
+    <div v-if="viewSelectToggleButtons[1].activate">
+      <match-team-analysis />
+    </div>
+
+    <div v-if="viewSelectToggleButtons[2].activate">
+      <v-sheet>
+        빌드
       </v-sheet>
-      
-      <!-- entry -->
-      <v-sheet                 
-        v-for="(entry, j) in team"
-        :key="j"                
-        max-height="40"
-        class=' d-flex align-center pt-1 pb-1'
-        :color="entry.summonerName === route.params.name ? orderedMatchEntries[1][2] : orderedMatchEntries[1][i]"
-      >        
+    </div>
 
-        <!-- entry-icon -->
-        <div>
-          <v-avatar 
-            rounded="md" 
-            :size="35"
-            class="ml-2 mr-1"            
-          >
-            <v-img :src="entry.url"></v-img>                        
-            <v-avatar class="entry-level">
-              {{ entry.champLevel }}
-            </v-avatar>
-          </v-avatar>    
-        </div>
+    <div v-if="viewSelectToggleButtons[3].activate">
+      <v-sheet>
+        etc
+      </v-sheet>
+    </div>
     
-        <!-- entry-spell -->
-        <div>
-          <div
-            v-for="(url, k) in entry.spellIconUrls"
-            :key="k"
-          >
-            <img :src="url" id="entry-spell"/>
-          </div>
-        </div>
-
-
-        <!-- entry-rune -->
-        <div>
-          <div
-            v-for="(url, k) in entry.runeIconUrls"
-            :key="k"
-          >
-            <v-avatar v-if=" k===0" size="18" color="#000000" style="text-align: center">                      
-              <img :src="url" id="entry-rune--main"/>
-            </v-avatar> 
-            <img v-else :src="url" id="entry-rune" />
-          </div>
-        </div>
-
-        <!-- entry-summonerName -->
-        <div 
-          @click="pushEntry(entry.summonerName)"
-          class="match-entry-name match-entry-name-seemore ml-1" :style="myNameBoldStyle(entry.summonerName)">
-          {{ entry.summonerName }}
-        </div>
-
-        <!-- entry-opScore -->
-        <template v-if="gameMode === '일반'">
-          <div class="match-entry-seemore-opScore">
-            {{ entry.opScore }}
-          </div>
-  
-          <div class="match-entry-seemore-rank">
-            <div v-if="entry.ranking !== '1st' " class="match-entry-seemore-ranking">
-              {{ entry.ranking }}
-            </div> 
-            <div v-else class="match-entry-seemore-ranking match-entry-seemore-ranking--mvp">
-              MVP
-            </div> 
-          </div>
-        </template>
-
-        <div v-else class="match-entry-seemore-opScore-empty"></div>
-
-        <!-- entry-kda -->
-        <div style="text-align: center" class="match-entry-seemore-kda-score">
-          <div class="match-entry-seemore-kda mt-1">
-            {{ entry.kills }}/{{ entry.deaths}}/{{ entry.assists }} ({{ entry.killInvolvementArea }}%)
-          </div>
-          <div :style="[selectScoreFontStyle(entry.score), {'font-weight': '600', 'font-size': '14px', 'opacity': '1'}]">
-            {{ entry.score }}
-          </div>
-        </div>
-
-        <!-- entry-damage -->
-        <div class="text-align match-entry-damage">
-          <div class="match-entry-font-grey mr-1">
-            {{ entry.totalDamageDealtToChampions.toLocaleString() }}
-          </div>
-          <div class="damage-bar-base">
-            <div :style="damageStyle(entry.damageWidth)"></div>            
-          </div>
-        </div>
-        
-        <div class="text-align ml-2 match-entry-damage">
-          <div class="match-entry-font-grey mr-1">
-            {{ entry.totalDamageTaken.toLocaleString() }}
-          </div>
-          <div class="damage-bar-base">
-            <div :style="damagedStyle(entry.damagedWidth)"></div>
-          </div>
-        </div>
-
-        <!-- entry-ward -->
-        <div class="text-align ml-2 match-entry-ward">
-          <div class="match-entry-font-grey">
-            {{ entry.visionWardsBoughtInGame }}
-          </div>
-          <div class="match-entry-font-grey">
-            {{ entry.wardsKilled }} / {{ entry.wardsPlaced }}
-          </div>          
-        </div>
-        
-        <!-- entry-cs -->
-        <div class="text-align ml-2 match-entry-ward">
-          <div class="match-entry-font-grey">
-            {{ entry.totalMinionsKilled }}
-          </div>
-          <div class="match-entry-font-grey">
-            분당 {{ entry.csPerMin }}
-          </div>          
-        </div>
-          
-        <!-- entry-items -->
-        <div class="ml-3 d-flex">
-          <div
-            v-for="(url, i) in entry.itemUrls" 
-            :key="i"
-          >
-            <img v-if="url" :src="url" alt="" class="match-entry-items mt-1">            
-            <div 
-              v-else class="match-entry-items empty-item"
-            ></div>            
-          </div>
-         </div>  
-      </v-sheet>
-  
-    </template>
     
   </v-sheet>
 
@@ -454,6 +472,7 @@ import runeJSON from '@/assets/runesReforged.json'
 import championJSON from '@/assets/championInfo.json'
 
 import KillChip from '../components/KillChip.vue'
+import MatchTeamAnalysis from '@/components/match/MatchTeamAnalysis.vue'
 import { useRoute, useRouter } from 'vue-router'
 import moment from 'moment'
 
@@ -462,7 +481,8 @@ export default {
     match: Object
   },
   components: {
-    KillChip
+    KillChip,
+    MatchTeamAnalysis
   },
   setup(props) {
 
@@ -749,7 +769,12 @@ export default {
       searchStore.searchContent(payload)
     }
 
-    const viewSelectToggleButtons = [
+    function selectDetailMenu(btnIndex) {
+      viewSelectToggleButtons.value.forEach(btn => btn.activate = false)
+       viewSelectToggleButtons.value[btnIndex].activate = true
+    }
+
+    const viewSelectToggleButtons = ref([
       {
         name: '종합',
         activate: true,
@@ -766,7 +791,7 @@ export default {
         name: 'etc',
         activate: false,
       }
-    ]
+    ])
     
     function createMatchEntries(entries) {
       
@@ -933,6 +958,7 @@ export default {
       // detail
       detailExpand,
       viewSelectToggleButtons,
+      selectDetailMenu,
       copyLinkText,
       copyLink: () => navigator.clipboard.writeText(matchLink.value).then(() => copyLinkText.value = 'Copied'),
 
@@ -1168,6 +1194,7 @@ export default {
 
 .filter-menu {
   min-width: 24%;
+  box-sizing: border-box;
 }
 
 .seemore-entry {
