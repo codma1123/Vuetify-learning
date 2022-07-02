@@ -834,7 +834,7 @@ export default {
     const entriesItemIconUrls = computed(() => props.match.matchEntries.map(matchEntries => matchEntries.itemsUrls))
     const createItemIconUrls = entry => entry.itemUrls.map(item => `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/item/${item}.png`)
     const createScore = entry => !entry.deaths ? 'Perfect' : ((entry.kills + entry.assists) / entry.deaths).toFixed(2) + ':1'
-    const createkillInvolvementArea = entry => !(entry.kills + entry.assists) ? 0 : Math.ceil(entry.kills + entry.assists / props.match.totalKills * 100)
+    const createkillInvolvementArea = entry => !(entry.kills + entry.assists) ? 0 : Math.ceil((entry.kills + entry.assists) / Number(props.match.totalKills) * 100)
     const createCsPerMin = entry => (entry.totalMinionsKilled / Number(duration.value[0])).toFixed(1)
     const selectScoreFontStyle = score => {
       if(score === 'Perfect') return {'color': '#eb663a'}

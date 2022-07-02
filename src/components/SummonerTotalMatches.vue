@@ -89,6 +89,7 @@ export default {
       {
         title: '솔로랭크',
         activate: false,
+        type: 'SOLORANK'
       },
       {
         title: '자유랭크',

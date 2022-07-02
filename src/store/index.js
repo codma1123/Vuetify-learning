@@ -9,7 +9,7 @@ const API_KEYS = [
   'RGAPI-8d145ff2-f5f3-43ad-9e38-0232dc06690f'
 ]
 
-const REQUEST_COUNT = 3
+const REQUEST_COUNT = 10
 
 const HEADER = {
   headers: {
@@ -71,7 +71,7 @@ export const useSearchStore = defineStore('search', {
       
       await axios.all(matchIdUrls.map(match => axios.get(match))).then(reses => {
         this.matches = reses.map(res => {
-          const { gameMode, participants, gameDuration, gameEndTimestamp, teams } = res.data.info          
+          const { gameMode, participants, gameDuration, gameEndTimestamp, teams, queueId } = res.data.info          
           
           // insert items url object key
           participants.forEach(participant => {
@@ -90,16 +90,12 @@ export const useSearchStore = defineStore('search', {
             gameEndTimestamp,    
             totalKills,     
             participants,   
+            queueId,
             teams,
-
             owner
           }
         })
       })
-
-      "https://asia.api.riotgames.com/lol/match/v5/matches/KR_5973078693?api_key=RGAPI-8f7f4b4d-c57e-412c-b636-820239b0b60f"
-
-      "https://asia.api.riotgames.com/lol/match/v5/matches/KR_5973078693?api_key=RGAPI-8f7f4b4d-c57e-412c-b636-820239b0b60f"
 
       this.user = { 
         summonerLevel,
@@ -131,13 +127,19 @@ export const useSearchStore = defineStore('search', {
         return
       }
 
-      this.matches = this.tempMatches.filter(match => match.gameMode === type)
+      if(type == 'SOLORANK') {
+        const filtered = this.tempMatches.filter(match => match.queueId == 420)      
+        this.matches = filtered.length !== 0 ? filtered : this.tempMatches
+        return
+      }
+      const filtered = this.tempMatches.filter(match => match.gameMode === type)      
+      this.matches = filtered.length !== 0 ? filtered : this.tempMatches
     },
 
     async setupUserIconCDN() {
       const res = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json')
       this.iconCdnVersion = res.data[0]      
-      console.log(this.iconCdnVersion = res.data[0])      
+      console.log(this.iconCdnVersion = res.data[0])     
     },
 
     

@@ -49,7 +49,7 @@ function addArray () {
 }
 
 function meanArray (arr) {
-  return arr.reduce((acc, cur) => acc + Number(cur))
+  return arr.reduce((acc, cur) => acc + Number(cur)) / arr.length
 }
 
 export default {

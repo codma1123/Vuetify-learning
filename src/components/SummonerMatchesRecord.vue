@@ -59,9 +59,7 @@
           <img :src="`../../public/icon-position-${line[i-1]}.svg`" class="records-prefer-position__img">  
         </div>
       </div>
-      
-          
-      
+            
     </div>
     
   </v-sheet>    
