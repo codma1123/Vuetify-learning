@@ -60,7 +60,7 @@
         </div>
 
          <!-- owner-rune-icon -->
-        <div style="'display': 'flex'">
+        <div class="d-flex">
           <v-avatar size="25" color="#000000" class="runes">
             <v-img            
               class="full-item main-rune"
@@ -445,7 +445,7 @@
     </div>
 
     <div v-if="viewSelectToggleButtons[1].activate">
-      <match-team-analysis />
+      <match-team-analysis :match="match" :computedEntries="matchEntries"/>
     </div>
 
     <div v-if="viewSelectToggleButtons[2].activate">
@@ -979,7 +979,7 @@ export default {
 <style>
 .matches {
   border-radius: 5px;
-  margin-bottom: 7px;
+  margin-bottom: 7px;  
   overflow: hidden;  
 }
 
