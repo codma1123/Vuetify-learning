@@ -53,10 +53,16 @@ function meanArray (arr) {
   return arr.reduce((acc, cur) => acc + Number(cur)) / arr.length
 }
 
+function swapArray10 (arr) {
+  const [one, two] = [arr.slice(0, 5), arr.slice(5, 10)]
+  return [...two, ...one]
+}
+
 export default {
   convertHMS,
   timeForToday,
   betweenTime,
   addArray,
-  meanArray
+  meanArray,
+  swapArray10
 }

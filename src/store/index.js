@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-af4e3b17-c710-45a7-96a7-903209743c09'
+const API_KEY = 'RGAPI-705c8181-72be-44ab-b86c-abd3a49e9abf'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
@@ -76,6 +76,7 @@ export const useSearchStore = defineStore('search', {
           // insert items url object key
           participants.forEach(participant => {
             participant.itemUrls = Array.from({length: 7}).map((_, i) => participant[`item${i}`])
+            participant.totalMinionsKilled = participant.totalMinionsKilled + participant.neutralMinionsKilled
           })
 
           // owner
