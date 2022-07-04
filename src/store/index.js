@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-705c8181-72be-44ab-b86c-abd3a49e9abf'
+const API_KEY = 'RGAPI-153da828-bef8-4bc3-a0fb-0bb6690ca6d6'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
@@ -30,7 +30,8 @@ export const useSearchStore = defineStore('search', {
     iconUrl: '',
     isRankGame: false,
     tryLoad: false,
-    tempMatches: []
+    tempMatches: [],
+    timeLineLoaded: false,
    }),  
   actions: {
 
@@ -70,8 +71,8 @@ export const useSearchStore = defineStore('search', {
       const matchIdUrls = matchListRes.data.map(matchId => `${urlConfig.asiaUrl}/lol/match/v5/matches/${matchId}?api_key=${API_KEY}`)
       
       await axios.all(matchIdUrls.map(match => axios.get(match))).then(reses => {
-        this.matches = reses.map(res => {
-          const { gameMode, participants, gameDuration, gameEndTimestamp, teams, queueId } = res.data.info          
+        this.matches = reses.map((res, i) => {
+          const { gameMode, participants, gameDuration, gameEndTimestamp, teams, queueId } = res.data.info  
           
           // insert items url object key
           participants.forEach(participant => {
@@ -93,7 +94,8 @@ export const useSearchStore = defineStore('search', {
             participants,   
             queueId,
             teams,
-            owner
+            owner,
+            matchId: matchListRes.data[i]
           }
         })
       })
@@ -142,6 +144,27 @@ export const useSearchStore = defineStore('search', {
       this.iconCdnVersion = res.data[0]      
       console.log(this.iconCdnVersion = res.data[0])     
     },
+
+    async searchContentTimeLine(matchId) {
+      this.timeLineLoaded = true
+    
+      try {
+        const res = await axios.get(`${urlConfig.asiaUrl}/lol/match/v5/matches/${matchId}/timeline?api_key=${API_KEY}`)        
+        
+        const timelines = res.data.info.frames.map(frame => ({                       
+          timeLine: (frame.timestamp / 60000).toFixed(),
+          totalGold: {
+            team1: Object.values(frame.participantFrames).slice(0, 5).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0),
+            team2: Object.values(frame.participantFrames).slice(5, 10).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0)            
+          }
+        }))
+
+        this.timeLineLoaded = false
+        return timelines
+      } catch (e){
+        console.log(e)
+      }             
+    }
 
     
 

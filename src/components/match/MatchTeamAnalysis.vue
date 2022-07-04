@@ -17,7 +17,7 @@
     </v-btn>    
   </v-sheet>
 
-  <v-sheet class="contentss" color="#282830">
+  <v-sheet class="contentss" color="#282830" v-if="btnMenus[0].activate">
     <div class="contentss-top-label text-center d-flex justify-center">
       <span class="win-team-dot"> </span>
       <span class="mr-4 mb-2"> 승리팀 </span>
@@ -229,19 +229,10 @@
         </div>
       </div>  
     </div>
+  </v-sheet>
 
-
-    <div class="d-flex ">
-
-    </div>
-    <div class="d-flex ">
-
-    </div>
-
-
-  
-
-
+  <v-sheet color="#282830" v-if="btnMenus[1].activate">
+    <match-team-analysis-gold-kill :match="match"/>
   </v-sheet>
 
 </template>
@@ -250,6 +241,7 @@
 import { computed, onMounted, ref } from 'vue'
 import useSizeSetup from '../../tools/SizeSetup.vue'
 import MatchTeamAnalysisDount from '@/components/match/MatchTeamAnalysisDount.vue'
+import MatchTeamAnalysisGoldKill from '@/components/match/MatchTeamAnalysisGoldkill.vue'
 
 export default {  
   props: {
@@ -257,7 +249,8 @@ export default {
     computedEntries: Object
   },
   components: {
-    MatchTeamAnalysisDount
+    MatchTeamAnalysisDount,
+    MatchTeamAnalysisGoldKill
   },
   setup(props) {
     const { contentSize, funcs } = useSizeSetup()
@@ -278,7 +271,6 @@ export default {
       },
       {
         name: '킬 맵',
-
         activate: false,  
       },
       {
@@ -353,9 +345,8 @@ export default {
     
     
 
-    onMounted(() => {      
-      
-            
+    onMounted(async () => {      
+      props.match.gameMode === 'ARAM' ? btnMenus.value.splice(1, 1) : null    
     })
 
     return {
@@ -388,6 +379,7 @@ export default {
 
 .contentss {  
   margin-top: -11px;
+  height: 550px;
 }
 
 .win-team-dot {
