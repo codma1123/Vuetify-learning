@@ -33,6 +33,7 @@ export const useSearchStore = defineStore('search', {
     tempMatches: [],
     timeLineLoaded: false,
     timeLineValues: [],
+    timeLineKills: [],
     timeLineLoadedFlag: false
    }),  
   actions: {
@@ -152,14 +153,36 @@ export const useSearchStore = defineStore('search', {
     
       try {
         const res = await axios.get(`${urlConfig.asiaUrl}/lol/match/v5/matches/${matchId}/timeline?api_key=${API_KEY}`)        
-        
+        console.log(res.data)
         const timelines = res.data.info.frames.map(frame => ({                       
           timeLine: (frame.timestamp / 60000).toFixed(),
-          totalGold: {
+          totalGold: { 
             team1: Object.values(frame.participantFrames).slice(0, 5).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0),
             team2: Object.values(frame.participantFrames).slice(5, 10).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0)            
-          }
+          },       
+          totalKill: {
+            
+          }   
         }))
+
+        this.timeLineKills = res.data.info.frames.map(frame => {
+          const killEvent = frame.events.filter(event => event.type === 'CHAMPION_KILL')         
+          let team1Kill = 0
+          let team2Kill = 0
+
+          if(killEvent.length) {
+            team1Kill = killEvent.filter(kill => kill.killerId < 6).length            
+            team2Kill = killEvent.filter(kill => kill.killerId > 5).length    
+          }
+          return {
+            timeLine: (frame.timestamp / 60000).toFixed(),
+            kills: {
+              team1: team1Kill,
+              team2: team2Kill
+            }
+          }
+        })
+        
 
         this.timeLineLoaded = false
         this.timeLineValues = timelines

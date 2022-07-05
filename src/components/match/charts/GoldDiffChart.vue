@@ -11,7 +11,6 @@ import { Line } from 'vue-chartjs'
 import { Chart, registerables } from 'chart.js'
 import { onMounted, ref } from 'vue'
 import useSizeSetup from '@/tools/SizeSetup.vue'
-import MatchTeamAnalysisVue from '../MatchTeamAnalysis.vue'
 
 export default {  
   components: {
