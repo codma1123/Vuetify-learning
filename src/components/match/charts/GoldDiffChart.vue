@@ -1,8 +1,9 @@
 <template>
   <Line       
     :chart-options="chartOptions"      
-    :chart-data="chartData"             
-    :width="30" :height="18"    
+    :chart-data="chartData"         
+    :plugins="plugins"    
+    :width="30" :height="13"    
   />      
 </template>
 
@@ -19,9 +20,9 @@ export default {
   
   setup() {
 
-    const { searchStore } = useSizeSetup()
+    const { searchStore, chartConfig } = useSizeSetup()
     const chartData = ref({})
-    const plugins = ref({})
+    const plugins = ref([])
 
     const createChartData = () => ({
       labels: Object.keys(searchStore.timeLineValues),
@@ -30,10 +31,6 @@ export default {
           label: '',
           borderColor: '#fff',
           data: searchStore.timeLineValues.map(value => Math.abs(value.totalGold.team1 - value.totalGold.team2)),
-          // pointRadius: element => 
-          //   Math.abs(
-          //     searchStore.timeLineValues[element.index].totalGold.team1 - searchStore.timeLineValues[element.index].totalGold.team2 
-          //   ) > 0 ? 
           backgroundColor: element =>{ 
             const v =  searchStore.timeLineValues[element.index].totalGold.team1 - searchStore.timeLineValues[element.index].totalGold.team2
             if(v > 0) return '#5383e8'
@@ -81,7 +78,7 @@ export default {
       elements: {
         point: {
           borderWidth: 0,
-          hoverBorderWidth: 3
+          hoverBorderWidth: 8
         }
       },
       plugins: {
@@ -107,11 +104,13 @@ export default {
 
     onMounted(() => {
       chartData.value = createChartData()
+      plugins.value = [chartConfig.verticalLine]
     })
 
     return {
       chartData,
       chartOptions,
+      plugins
     }
   }
 }

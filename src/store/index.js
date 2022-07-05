@@ -160,29 +160,37 @@ export const useSearchStore = defineStore('search', {
             team1: Object.values(frame.participantFrames).slice(0, 5).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0),
             team2: Object.values(frame.participantFrames).slice(5, 10).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0)            
           },       
-          totalKill: {
-            
-          }   
+ 
         }))
 
-        this.timeLineKills = res.data.info.frames.map(frame => {
+        const killTimelines = res.data.info.frames.map(frame => {
           const killEvent = frame.events.filter(event => event.type === 'CHAMPION_KILL')         
-          let team1Kill = 0
-          let team2Kill = 0
-
-          if(killEvent.length) {
-            team1Kill = killEvent.filter(kill => kill.killerId < 6).length            
-            team2Kill = killEvent.filter(kill => kill.killerId > 5).length    
-          }
-          return {
-            timeLine: (frame.timestamp / 60000).toFixed(),
-            kills: {
-              team1: team1Kill,
-              team2: team2Kill
-            }
+          return killEvent.length 
+          ? { 
+              timeLine: (frame.timestamp / 60000).toFixed(),
+              team1Kill: killEvent.filter(kill => kill.killerId < 6).length,
+              team2Kill: killEvent.filter(kill => kill.killerId > 5).length    
+          } 
+          : {
+              timeLine: (frame.timestamp / 60000).toFixed(),
+              team1Kill: 0,
+              team2Kill: 0
           }
         })
+
+        const kill1 = []
+        const kill2 = []
+        killTimelines.map(timeline => timeline.team1Kill).reduce((prev, cur, i) => kill1[i] = prev + cur, 0)
+        killTimelines.map(timeline => timeline.team2Kill).reduce((prev, cur, i) => kill2[i] = prev + cur, 0)
+        this.timeLineKills = killTimelines.map((timeline, i) => ({
+          timeLine: timeline.timeLine,
+          totalKill: {
+            team1: kill1[i],
+            team2: kill2[i]
+          }
+        }))
         
+  
 
         this.timeLineLoaded = false
         this.timeLineValues = timelines

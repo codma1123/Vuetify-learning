@@ -3,7 +3,7 @@
     :chart-options="chartOptions"      
     :chart-data="chartData"         
     :plugins="plugins"
-    :width="30" :height="18"
+    :width="30" :height="13"
     v-if="loaded"
   />    
 </template>
@@ -11,7 +11,7 @@
 <script>
 import { Line } from 'vue-chartjs'
 import { Chart, registerables } from 'chart.js'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, onUpdated, onBeforeMount } from 'vue'
 import useSizeSetup from '@/tools/SizeSetup.vue'
 
 export default {  
@@ -108,6 +108,7 @@ export default {
       },
     }
 
+
     onMounted(async () => {
       Chart.register(...registerables)
 
@@ -117,6 +118,8 @@ export default {
       plugins.value = [chartConfig.myCrossHair]
       loaded.value = true
     })
+
+    
 
     return {
       chartData,

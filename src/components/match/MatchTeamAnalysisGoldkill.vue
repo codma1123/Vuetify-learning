@@ -72,7 +72,7 @@ export default {
 
 <style>
 .gold-chart {
-  height: 500px;
+  height: 400px;
 }
 
 .gold-chart-label {
