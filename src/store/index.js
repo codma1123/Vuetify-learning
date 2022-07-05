@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-153da828-bef8-4bc3-a0fb-0bb6690ca6d6'
+const API_KEY = 'RGAPI-e0d16ed1-d482-4d07-93e6-c74a6b6207fa'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
@@ -32,6 +32,8 @@ export const useSearchStore = defineStore('search', {
     tryLoad: false,
     tempMatches: [],
     timeLineLoaded: false,
+    timeLineValues: [],
+    timeLineLoadedFlag: false
    }),  
   actions: {
 
@@ -160,6 +162,8 @@ export const useSearchStore = defineStore('search', {
         }))
 
         this.timeLineLoaded = false
+        this.timeLineValues = timelines
+        this.timeLineLoadedFlag = true
         return timelines
       } catch (e){
         console.log(e)

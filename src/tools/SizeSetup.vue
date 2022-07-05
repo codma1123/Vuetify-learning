@@ -5,6 +5,7 @@
 import { useSearchStore } from '../store'
 import { contentSize, urlConfig } from './divice'
 import funcs from './funcs'
+import chartConfig from './chartConfig'
 
 export default function useSizeSetup() {
   const searchStore = useSearchStore()
@@ -13,7 +14,8 @@ export default function useSizeSetup() {
     searchStore,
     contentSize,
     urlConfig,
-    funcs
+    funcs,
+    chartConfig
   }
 }
 </script>
