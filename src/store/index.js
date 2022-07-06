@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
+import { log } from 'mathjs'
 
 const API_KEY = 'RGAPI-8583f619-1bc2-4f6e-9fcc-8be0faa623c2'
 
@@ -9,7 +10,7 @@ const API_KEYS = [
   'RGAPI-8d145ff2-f5f3-43ad-9e38-0232dc06690f'
 ]
 
-const REQUEST_COUNT = 10
+const REQUEST_COUNT = 15
 
 const HEADER = {
   headers: {
@@ -34,6 +35,7 @@ export const useSearchStore = defineStore('search', {
     timeLineLoaded: false,
     timeLineValues: [],
     timeLineKills: [],
+    killMap: [],
     timeLineLoadedFlag: false
    }),  
   actions: {
@@ -177,27 +179,52 @@ export const useSearchStore = defineStore('search', {
         const killTimelines = res.data.info.frames.map(frame => {
           const killEvent = frame.events.filter(event => event.type === 'CHAMPION_KILL')         
           const timeLine = (frame.timestamp / 60000).toFixed()
-          console.log(killEvent.map(kill => ({position: kill.position, killerId: kill.killerId})), frame.timestamp)
+          const killPosition = killEvent.map(kill => ({position: kill.position, killerId: kill.killerId}))
 
           if(!killEvent.length) return {
             timeLine,
+            killPosition,
             team1Kill: 0,
-            team2Kill: 0
+            team2Kill: 0,
           }
 
           if(sort) return {
             timeLine,
-            team1Kill: killEvent.filter(kill => kill.killerId > 5).length,
+            killPosition,
+            team1Kill: killEvent.filter(kill => kill.killerId > 5).length, 
             team2Kill: killEvent.filter(kill => kill.killerId < 6).length    
           }
 
           return {
             timeLine,
+            killPosition,
             team1Kill: killEvent.filter(kill => kill.killerId < 6).length,
             team2Kill: killEvent.filter(kill => kill.killerId > 5).length    
           }
         })
 
+        
+        const championById = [...Array.from({length: 10}).map((_, i) => i + 1)].reduce((acc, cur, i) => {
+          const { summonerName, championName } = match.participants.find(participant => participant.participantId == cur)
+          acc[cur] = { 
+            summonerName,
+            championName,
+            position: []
+          }
+          return acc
+        }, {})
+        
+        killTimelines.forEach(timeline => {
+          if(timeline.killPosition.length) {
+            timeline.killPosition.forEach(position => {
+              championById[position.killerId].position.push({position: position.position, timeline: timeline.timeLine})                            
+            })
+          }
+        })
+
+        const positionArray = Object.values(championById)        
+        const sortedPositionArray = sort ? [...positionArray.slice(5, 10), ...positionArray.slice(0, 5)] : positionArray
+                              
         const kill1 = []
         const kill2 = []
         killTimelines.map(timeline => timeline.team1Kill).reduce((prev, cur, i) => kill1[i] = prev + cur, 0)
@@ -209,10 +236,11 @@ export const useSearchStore = defineStore('search', {
             team2: kill2[i]
           }
         }))
-        
-  
-        this.timeLineLoaded = false
+
+
+        this.killMap = sortedPositionArray
         this.timeLineValues = timelines
+        this.timeLineLoaded = false
         this.timeLineLoadedFlag = true
         return timelines
       } catch (e){

@@ -6,6 +6,7 @@
 
 <script>
 import useSizeSetup from '@/tools/SizeSetup.vue'
+import { onMounted } from 'vue'
 
 export default {
   props: {
@@ -13,10 +14,27 @@ export default {
   },
   setup() {
     const { searchStore } = useSizeSetup()
+    const MAP_MAX_SCALE = 14000
+    const MAP_SCALE = 350
+
+    function createDotPositions () {
+      console.log(
+        searchStore.killMap.map(kill => kill.position.map(position => convertScale(position.position)))
+      )
+    }
+
+    const convertScale = (position) => ({
+      xScale: ( MAP_SCALE / MAP_MAX_SCALE) * Number(position.x),
+      yScale: ( MAP_SCALE / MAP_MAX_SCALE) * Number(position.y)
+    })
+
+    onMounted(() => {      
+      createDotPositions()
+    })
 
 
     return {
-
+      
     }
   }
 }
@@ -25,8 +43,8 @@ export default {
 <style>
 .minimap {
   border-radius: 20px;
-  height: 250px;
-  width: 250px;  
+  height: 350px;
+  width: 350px;  
   object-fit: cover;
   object-position: 20% 10%; 
   filter: opacity(.4) drop-shadow(0 0 0 rgb(32, 45, 55));  
