@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-e0d16ed1-d482-4d07-93e6-c74a6b6207fa'
+const API_KEY = 'RGAPI-8583f619-1bc2-4f6e-9fcc-8be0faa623c2'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
@@ -46,6 +46,7 @@ export const useSearchStore = defineStore('search', {
       const encodedName = encodeURI(name.trim())
       const idRes = await axios.get(`${urlConfig.baseUrl}/lol/summoner/v4/summoners/by-name/${encodedName}?api_key=${API_KEY}`)
       const { accountId, summonerLevel, profileIconId, id, revisionDate, puuid } = idRes.data
+      console.log('owner puuid', puuid)
       
 
       // get league entries in all queues for a given summoner ID
@@ -148,33 +149,52 @@ export const useSearchStore = defineStore('search', {
       console.log(this.iconCdnVersion = res.data[0])     
     },
 
-    async searchContentTimeLine(matchId) {
+    async searchContentTimeLine(match) {
       this.timeLineLoaded = true
+      const sort = !match.participants[0].win
     
       try {
-        const res = await axios.get(`${urlConfig.asiaUrl}/lol/match/v5/matches/${matchId}/timeline?api_key=${API_KEY}`)        
+        const res = await axios.get(`${urlConfig.asiaUrl}/lol/match/v5/matches/${match.matchId}/timeline?api_key=${API_KEY}`)        
         console.log(res.data)
-        const timelines = res.data.info.frames.map(frame => ({                       
-          timeLine: (frame.timestamp / 60000).toFixed(),
-          totalGold: { 
-            team1: Object.values(frame.participantFrames).slice(0, 5).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0),
-            team2: Object.values(frame.participantFrames).slice(5, 10).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0)            
-          },       
- 
-        }))
+        const timelines = res.data.info.frames.map(frame => {       
+          const timeLine = (frame.timestamp / 60000).toFixed()
+          if(sort) return {
+            timeLine,
+            totalGold: { 
+              team1: Object.values(frame.participantFrames).slice(5, 10).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0),
+              team2: Object.values(frame.participantFrames).slice(0, 5).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0)            
+            },       
+          } 
+          return {
+            timeLine,
+            totalGold: { 
+              team1: Object.values(frame.participantFrames).slice(0, 5).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0),
+              team2: Object.values(frame.participantFrames).slice(5, 10).reduce((totalGold, participantFrame) => totalGold + participantFrame.totalGold, 0)            
+            },   
+          }                         
+        })
 
         const killTimelines = res.data.info.frames.map(frame => {
           const killEvent = frame.events.filter(event => event.type === 'CHAMPION_KILL')         
-          return killEvent.length 
-          ? { 
-              timeLine: (frame.timestamp / 60000).toFixed(),
-              team1Kill: killEvent.filter(kill => kill.killerId < 6).length,
-              team2Kill: killEvent.filter(kill => kill.killerId > 5).length    
-          } 
-          : {
-              timeLine: (frame.timestamp / 60000).toFixed(),
-              team1Kill: 0,
-              team2Kill: 0
+          const timeLine = (frame.timestamp / 60000).toFixed()
+          console.log(killEvent.map(kill => ({position: kill.position, killerId: kill.killerId})), frame.timestamp)
+
+          if(!killEvent.length) return {
+            timeLine,
+            team1Kill: 0,
+            team2Kill: 0
+          }
+
+          if(sort) return {
+            timeLine,
+            team1Kill: killEvent.filter(kill => kill.killerId > 5).length,
+            team2Kill: killEvent.filter(kill => kill.killerId < 6).length    
+          }
+
+          return {
+            timeLine,
+            team1Kill: killEvent.filter(kill => kill.killerId < 6).length,
+            team2Kill: killEvent.filter(kill => kill.killerId > 5).length    
           }
         })
 
@@ -191,7 +211,6 @@ export const useSearchStore = defineStore('search', {
         }))
         
   
-
         this.timeLineLoaded = false
         this.timeLineValues = timelines
         this.timeLineLoadedFlag = true
@@ -200,6 +219,10 @@ export const useSearchStore = defineStore('search', {
         console.log(e)
       }             
     }
+
+    // getKillTimeLinePosition() {
+    //   this.
+    // }
 
     
 

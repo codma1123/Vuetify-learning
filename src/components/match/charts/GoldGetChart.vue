@@ -113,7 +113,7 @@ export default {
       Chart.register(...registerables)
 
       loaded.value = false
-      const results = await searchStore.searchContentTimeLine(props.match.matchId)      
+      const results = searchStore.timeLineValues
       chartData.value = createChartData(results)
       plugins.value = [chartConfig.myCrossHair]
       loaded.value = true

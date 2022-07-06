@@ -231,8 +231,12 @@
     </div>
   </v-sheet>
 
-  <v-sheet color="#282830" v-if="btnMenus[1].activate">
+  <v-sheet color="#282830" v-if="selectedMenu === '골드 & 킬'">
     <match-team-analysis-gold-kill :match="match"/>
+  </v-sheet>
+
+  <v-sheet color="#282830" v-if="selectedMenu === '킬 맵'">
+    <match-team-analysis-kill-map :match="match"/>
   </v-sheet>
 
 </template>
@@ -242,6 +246,8 @@ import { computed, onMounted, ref } from 'vue'
 import useSizeSetup from '../../tools/SizeSetup.vue'
 import MatchTeamAnalysisDount from '@/components/match/MatchTeamAnalysisDount.vue'
 import MatchTeamAnalysisGoldKill from '@/components/match/MatchTeamAnalysisGoldkill.vue'
+import MatchTeamAnalysisKillMap from '@/components/match/MatchTeamAnalysisKillMap.vue'
+import { useSearchStore } from '../../store'
 
 export default {  
   props: {
@@ -250,10 +256,11 @@ export default {
   },
   components: {
     MatchTeamAnalysisDount,
-    MatchTeamAnalysisGoldKill
+    MatchTeamAnalysisGoldKill,
+    MatchTeamAnalysisKillMap
   },
   setup(props) {
-    const { contentSize, funcs } = useSizeSetup()
+    const { contentSize, funcs, searchStore } = useSizeSetup()
 
     const BAR_SCALE = 85
 
@@ -278,6 +285,8 @@ export default {
         activate: false,  
       },
     ])
+
+    const selectedMenu = computed(() => btnMenus.value.find(menu => menu.activate).name)
 
     function selectAnalysisMenu (btnIndex) {
       btnMenus.value.forEach(btn => btn.activate = false)
@@ -347,6 +356,8 @@ export default {
 
     onMounted(async () => {      
       props.match.gameMode === 'ARAM' ? btnMenus.value.splice(1, 1) : null    
+      await searchStore.searchContentTimeLine(props.match)
+      
     })
 
     return {
@@ -360,7 +371,9 @@ export default {
       getBarStyle,
       getBarValueStyle,
       championUrls,
-      getTotalStat
+      getTotalStat,
+
+      selectedMenu
     }
   } 
 }
