@@ -232,11 +232,19 @@
   </v-sheet>
 
   <v-sheet color="#282830" v-if="selectedMenu === '골드 & 킬'">
-    <match-team-analysis-gold-kill :match="match"/>
+    <match-team-analysis-gold-kill 
+      :match="match" 
+      :timelineProps="timelineProps"
+      :timeLineKillsProps="timeLineKillsProps"      
+    />
+    
   </v-sheet>
 
   <v-sheet color="#282830" v-if="selectedMenu === '킬 맵'">
-    <match-team-analysis-kill-map :match="match"/>
+    <match-team-analysis-kill-map 
+      :match="match"
+      :killMapProps="killMapProps"
+    />
   </v-sheet>
 
 </template>
@@ -247,7 +255,6 @@ import useSizeSetup from '../../tools/SizeSetup.vue'
 import MatchTeamAnalysisDount from '@/components/match/MatchTeamAnalysisDount.vue'
 import MatchTeamAnalysisGoldKill from '@/components/match/MatchTeamAnalysisGoldkill.vue'
 import MatchTeamAnalysisKillMap from '@/components/match/MatchTeamAnalysisKillMap.vue'
-import { useSearchStore } from '../../store'
 
 export default {  
   props: {
@@ -266,6 +273,10 @@ export default {
 
     const winSortedParticipants = ref([])
     const championUrls = ref([])
+    const timelineProps = ref([])
+    const timeLineKillsProps = ref([])
+    const killMapProps = ref([])
+
 
     const btnMenus = ref([
       {
@@ -356,8 +367,12 @@ export default {
 
     onMounted(async () => {      
       props.match.gameMode === 'ARAM' ? btnMenus.value.splice(1, 1) : null    
-      await searchStore.searchContentTimeLine(props.match)
-      
+      const { timelines, timeLineKills, killMap } = await searchStore.searchContentTimeLine(props.match)
+      timelineProps.value = timelines
+      timeLineKillsProps.value = timeLineKills
+      killMapProps.value = killMap
+
+          
     })
 
     return {
@@ -373,7 +388,11 @@ export default {
       championUrls,
       getTotalStat,
 
-      selectedMenu
+      selectedMenu,
+
+      timelineProps,
+      timeLineKillsProps,
+      killMapProps,
     }
   } 
 }

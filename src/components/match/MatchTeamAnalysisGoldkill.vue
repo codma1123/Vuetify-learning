@@ -38,9 +38,9 @@
   </div>
 
   <div class="gold-chart">    
-    <gold-get-chart  v-if="text==='goldGet'"  :match="match" />
-    <gold-diff-chart v-if="text==='goldDiff'"  />    
-    <kill-diff-chart v-if="text==='killDiff'"  />    
+    <gold-get-chart  v-if="text==='goldGet'"  :timelineProps="timelineProps" :match="match" />
+    <gold-diff-chart v-if="text==='goldDiff'" :timelineProps="timelineProps"/>    
+    <kill-diff-chart v-if="text==='killDiff'" :timelineProps="timelineProps" :timeLineKillsProps="timeLineKillsProps" />    
   </div>
 
 </template>
@@ -54,7 +54,9 @@ import KillDiffChart from '@/components/match/charts/KillDiffChart.vue'
 
 export default {
   props: {
-    match: Object
+    match: Object,
+    timelineProps: Array,
+    timeLineKillsProps: Array,
   },
   components: {
     GoldDiffChart,

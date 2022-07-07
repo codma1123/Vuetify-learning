@@ -17,8 +17,11 @@ export default {
   components: {
     Line,
   },
-
-  setup() {
+  props: {
+    timeLineKillsProps: Array,
+    timelineProps: Array
+  },
+  setup(props) {
     const { searchStore, chartConfig } = useSizeSetup()
     const chartData = ref({})
     const plugins = ref([])
@@ -79,15 +82,15 @@ export default {
     }
 
     const createChartData = () => ({
-      labels: Object.keys(searchStore.timeLineValues),
+      labels: Object.keys(props.timelineProps),
       datasets: [
         {
           label: '',
           borderColor: '#fff',
-          data: searchStore.timeLineKills.map(value => Math.abs(value.totalKill.team1 - value.totalKill.team2)),
+          data: props.timeLineKillsProps.map(value => Math.abs(value.totalKill.team1 - value.totalKill.team2)),
 
           backgroundColor: element =>{ 
-            const v =  searchStore.timeLineKills[element.index].totalKill.team1 - searchStore.timeLineKills[element.index].totalKill.team2
+            const v =  props.timeLineKillsProps[element.index].totalKill.team1 - props.timeLineKillsProps[element.index].totalKill.team2
             if(v > 0) return '#5383e8'
             if(v < 0) return '#e84057'
             return 'black'
@@ -102,7 +105,6 @@ export default {
     })
 
     onMounted(() => {
-      console.log(searchStore.thisLineKills)
       chartData.value = createChartData()
       plugins.value = [chartConfig.verticalLine]
     })

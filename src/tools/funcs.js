@@ -58,11 +58,21 @@ function swapArray10 (arr) {
   return [...two, ...one]
 }
 
+function createRandomColor () {
+  return "#" + Math.round(Math.random() * 0xffffff).toString(16)
+}
+
+function createChampionIconUrl (url, cdn, name) {
+  return `${url}/${cdn}/img/champion/${name}.png`
+}
+
 export default {
   convertHMS,
   timeForToday,
   betweenTime,
   addArray,
   meanArray,
-  swapArray10
+  swapArray10,
+  createRandomColor,
+  createChampionIconUrl
 }

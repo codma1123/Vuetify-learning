@@ -609,7 +609,8 @@ export default {
 
 
     // owner
-    const ownerChampionIconUrl = computed(() => `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${props.match.owner.championName}.png`)
+    
+    const ownerChampionIconUrl = computed(() => funcs.createChampionIconUrl(urlConfig.imgUrl, searchStore.iconCdnVersion, props.match.owner.championName))
     const ownerItemIconUrls = computed(() => createItemIconUrls(props.match.owner))    
     const ownerSpellIconUrls = computed(() => ([
        `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/spell/${spellEnum[props.match.owner.summoner1Id + '']}.png`,

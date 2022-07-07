@@ -17,22 +17,24 @@ export default {
   components: {
     Line
   },
-  
-  setup() {
+  props: {
+    timelineProps: Array
+  },  
+  setup(props) {
 
-    const { searchStore, chartConfig } = useSizeSetup()
+    const { chartConfig } = useSizeSetup()
     const chartData = ref({})
     const plugins = ref([])
 
     const createChartData = () => ({
-      labels: Object.keys(searchStore.timeLineValues),
+      labels: Object.keys(props.timelineProps),
       datasets: [
         {
           label: '',
           borderColor: '#fff',
-          data: searchStore.timeLineValues.map(value => Math.abs(value.totalGold.team1 - value.totalGold.team2)),
+          data: props.timelineProps.map(value => Math.abs(value.totalGold.team1 - value.totalGold.team2)),
           backgroundColor: element =>{ 
-            const v =  searchStore.timeLineValues[element.index].totalGold.team1 - searchStore.timeLineValues[element.index].totalGold.team2
+            const v =  props.timelineProps[element.index].totalGold.team1 - props.timelineProps[element.index].totalGold.team2
             if(v > 0) return '#5383e8'
             if(v < 0) return '#e84057'
             return 'black'

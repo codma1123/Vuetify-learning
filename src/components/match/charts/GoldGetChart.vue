@@ -16,7 +16,8 @@ import useSizeSetup from '@/tools/SizeSetup.vue'
 
 export default {  
   props: {
-    match: Object
+    match: Object,
+    timelineProps: Array
   },
 
   components: {
@@ -24,27 +25,27 @@ export default {
   },
 
   setup(props) {
-    const { searchStore, chartConfig } = useSizeSetup()
+    const { chartConfig } = useSizeSetup()
     
     const chartData = ref({})
     const plugins = ref({})
     const loaded = ref(false)
 
-    function createChartData(results) {
+    function createChartData() {
       return {
-        labels: Object.keys(results),
+        labels: Object.keys(props.timelineProps),
         datasets: [
           {
             label: '승리팀',
             borderColor: '#5383e8',
-            data: results.map(result => result.totalGold.team1),            
+            data: props.timelineProps.map(result => result.totalGold.team1),            
             pointRadius: 0,                        
             tension: 0.4
           },
           {
             label: '패배팀',
             borderColor: '#e84057',
-            data: results.map(result => result.totalGold.team2),
+            data: props.timelineProps.map(result => result.totalGold.team2),
             pointRadius: 0,
             tension: 0.4
           }
@@ -113,8 +114,7 @@ export default {
       Chart.register(...registerables)
 
       loaded.value = false
-      const results = searchStore.timeLineValues
-      chartData.value = createChartData(results)
+      chartData.value = createChartData()
       plugins.value = [chartConfig.myCrossHair]
       loaded.value = true
     })

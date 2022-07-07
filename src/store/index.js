@@ -157,7 +157,6 @@ export const useSearchStore = defineStore('search', {
     
       try {
         const res = await axios.get(`${urlConfig.asiaUrl}/lol/match/v5/matches/${match.matchId}/timeline?api_key=${API_KEY}`)        
-        console.log(res.data)
         const timelines = res.data.info.frames.map(frame => {       
           const timeLine = (frame.timestamp / 60000).toFixed()
           if(sort) return {
@@ -179,7 +178,7 @@ export const useSearchStore = defineStore('search', {
         const killTimelines = res.data.info.frames.map(frame => {
           const killEvent = frame.events.filter(event => event.type === 'CHAMPION_KILL')         
           const timeLine = (frame.timestamp / 60000).toFixed()
-          const killPosition = killEvent.map(kill => ({position: kill.position, killerId: kill.killerId}))
+          const killPosition = killEvent.map(kill => ({position: kill.position, killerId: kill.killerId, victimId: kill.victimId}))
 
           if(!killEvent.length) return {
             timeLine,
@@ -217,19 +216,26 @@ export const useSearchStore = defineStore('search', {
         killTimelines.forEach(timeline => {
           if(timeline.killPosition.length) {
             timeline.killPosition.forEach(position => {
-              championById[position.killerId].position.push({position: position.position, timeline: timeline.timeLine})                            
+              championById[position.killerId].position.push({
+                position: position.position, 
+                timeline: timeline.timeLine,
+                victim: {
+                  summonerName: championById[position.victimId].summonerName,
+                  championName: championById[position.victimId].championName,
+                }
+              })                            
             })
           }
         })
 
         const positionArray = Object.values(championById)        
-        const sortedPositionArray = sort ? [...positionArray.slice(5, 10), ...positionArray.slice(0, 5)] : positionArray
+        const killMap = sort ? [...positionArray.slice(5, 10), ...positionArray.slice(0, 5)] : positionArray
                               
         const kill1 = []
         const kill2 = []
         killTimelines.map(timeline => timeline.team1Kill).reduce((prev, cur, i) => kill1[i] = prev + cur, 0)
         killTimelines.map(timeline => timeline.team2Kill).reduce((prev, cur, i) => kill2[i] = prev + cur, 0)
-        this.timeLineKills = killTimelines.map((timeline, i) => ({
+        const timeLineKills = killTimelines.map((timeline, i) => ({
           timeLine: timeline.timeLine,
           totalKill: {
             team1: kill1[i],
@@ -237,12 +243,13 @@ export const useSearchStore = defineStore('search', {
           }
         }))
 
-
-        this.killMap = sortedPositionArray
-        this.timeLineValues = timelines
         this.timeLineLoaded = false
         this.timeLineLoadedFlag = true
-        return timelines
+        return {
+          timelines,
+          timeLineKills,
+          killMap
+        }
       } catch (e){
         console.log(e)
       }             

@@ -9,7 +9,8 @@ import chartConfig from './chartConfig'
 
 export default function useSizeSetup() {
   const searchStore = useSearchStore()
-  
+
+    
   return {
     searchStore,
     contentSize,
