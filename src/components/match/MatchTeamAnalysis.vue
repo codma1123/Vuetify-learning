@@ -244,11 +244,7 @@
       :killMapProps="killMapProps"/>    
   </v-sheet>
 
-  <v-sheet color="#282830" v-if="selectedMenu === '킬 맵'">
-    <match-team-analysis-kill-map 
-      :match="match"
-      :killMapProps="killMapProps"/>
-  </v-sheet>
+
 
   
 </template>
