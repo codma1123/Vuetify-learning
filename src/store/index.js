@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
+import funcs from '../tools/funcs.js'
 import axios from 'axios'
 import { log } from 'mathjs'
 
-const API_KEY = 'RGAPI-8583f619-1bc2-4f6e-9fcc-8be0faa623c2'
+const API_KEY = 'RGAPI-da7c14a4-9e7f-4583-afb8-fcd9bb3bdd7f'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
@@ -36,8 +37,11 @@ export const useSearchStore = defineStore('search', {
     timeLineValues: [],
     timeLineKills: [],
     killMap: [],
-    timeLineLoadedFlag: false
-   }),  
+    timeLineLoadedFlag: false,
+
+    buildLoading: false
+  }),  
+
   actions: {
 
     async searchContent(name) {           
@@ -48,9 +52,7 @@ export const useSearchStore = defineStore('search', {
       const encodedName = encodeURI(name.trim())
       const idRes = await axios.get(`${urlConfig.baseUrl}/lol/summoner/v4/summoners/by-name/${encodedName}?api_key=${API_KEY}`)
       const { accountId, summonerLevel, profileIconId, id, revisionDate, puuid } = idRes.data
-      console.log('owner puuid', puuid)
       
-
       // get league entries in all queues for a given summoner ID
       let leagueRes = await axios.get(`${urlConfig.baseUrl}/lol/league/v4/entries/by-summoner/${id}?api_key=${API_KEY}`)
       let queueType = 0
@@ -87,10 +89,8 @@ export const useSearchStore = defineStore('search', {
           })
 
           // owner
-          const owner = participants.find(participant => participant.summonerName === name)          
-          
+          const owner = participants.find(participant => participant.summonerName === name)                    
           const totalKills = teams.find(team => team.teamId == owner.teamId).objectives.champion.kills
-
                                                           
           return { 
             gameMode,
@@ -121,7 +121,6 @@ export const useSearchStore = defineStore('search', {
         bookmarked: false
       }      
       this.iconUrl = `${urlConfig.imgUrl}/${this.iconCdnVersion}/img/profileicon/${profileIconId}.png`     
-
 
       // done phase
       this.userInfoLoaded = false
@@ -253,13 +252,34 @@ export const useSearchStore = defineStore('search', {
       } catch (e){
         console.log(e)
       }             
-    }
+    },
 
-    // getKillTimeLinePosition() {
-    //   this.
-    // }
+    async searchBuild (match) {
+      try {
+        this.buildLoading = true
+  
+        const res = await axios.get(`${urlConfig.asiaUrl}/lol/match/v5/matches/${match.matchId}/timeline?api_key=${API_KEY}`)
 
-    
+        const ownerTimeLine = []
+        const ownerId = match.owner.participantId
+        
+        res.data.info.frames.forEach(frame => {
+          ownerTimeLine.push({
+            timestamp: funcs.convertTimestampToMin(frame.timestamp),
+            items: frame.events.filter(event => event.participantId === ownerId)
+                                .filter(event => (event.type === 'ITEM_DESTROYED') || (event.type === 'ITEM_PURCHASED'))
+                                  .map(event => ({timestamp: funcs.convertTimestampToMin(event.timestamp), itemId: event.itemId, type: event.type}))
+          })
+        })
+
+        this.buildLoading = false
+
+        return ownerTimeLine
+  
+      } catch (e){
+        console.log(e)
+      }
+    },
 
   },
 

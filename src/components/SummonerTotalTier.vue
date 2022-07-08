@@ -67,9 +67,7 @@ export default {
   setup(props) {
     const searchStore = useSearchStore()    
     const tierArab = new Map([['IV', '4'], ['III', '3'], ['II', '2'], ['I', '1']])
-    const winRate = computed(() =>
-      Math.round(searchStore.user.wins / (searchStore.user.losses + searchStore.user.wins) * 100)
-    )
+    const winRate = computed(() => Math.round(searchStore.user.wins / (searchStore.user.losses + searchStore.user.wins) * 100))
 
     const winRateFontStyle = {
       'opacity': 0.3,

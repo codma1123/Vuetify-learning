@@ -60,7 +60,7 @@
         </div>
 
          <!-- owner-rune-icon -->
-        <div class="d-flex">
+        <div>
           <v-avatar size="25" color="#000000" class="runes">
             <v-img            
               class="full-item main-rune"
@@ -449,9 +449,7 @@
     </div>
 
     <div v-if="viewSelectToggleButtons[2].activate">
-      <v-sheet>
-        빌드
-      </v-sheet>
+      <match-team-build :match="match" />
     </div>
 
     <div v-if="viewSelectToggleButtons[3].activate">
@@ -473,6 +471,7 @@ import championJSON from '@/assets/championInfo.json'
 
 import KillChip from '../components/KillChip.vue'
 import MatchTeamAnalysis from '@/components/match/MatchTeamAnalysis.vue'
+import MatchTeamBuild from '@/components/match/MatchTeamBuild.vue'
 import { useRoute, useRouter } from 'vue-router'
 import moment from 'moment'
 
@@ -482,7 +481,8 @@ export default {
   },
   components: {
     KillChip,
-    MatchTeamAnalysis
+    MatchTeamAnalysis,
+    MatchTeamBuild
   },
   setup(props) {
 
@@ -849,7 +849,6 @@ export default {
       const subObj = runeJSON.find(subRune => subRune.id === perks.styles[1].style)
 
       const runeObj = mainObj?.slots[0].runes.find(rune => rune.id === runeId)
-
 
       return [`${urlConfig.imgUrl}/img/${runeObj.icon}`, `${urlConfig.imgUrl}/img/${subObj.icon}`]
     }

@@ -66,6 +66,14 @@ function createChampionIconUrl (url, cdn, name) {
   return `${url}/${cdn}/img/champion/${name}.png`
 }
 
+function createItemIconUrl (url, cdn, id) {
+  return `${url}/${cdn}/img/item/${id}.png`
+}
+
+function convertTimestampToMin(timestamp) {
+  return (timestamp / 60000).toFixed()
+}
+
 export default {
   convertHMS,
   timeForToday,
@@ -74,5 +82,7 @@ export default {
   meanArray,
   swapArray10,
   createRandomColor,
-  createChampionIconUrl
+  createChampionIconUrl,
+  createItemIconUrl,
+  convertTimestampToMin
 }

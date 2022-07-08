@@ -52,7 +52,9 @@
       <div v-for="(participant, i) in loseTeam" :key="i" class="d-flex align-center mt-3 mr-3">
         <div :style="createChampionDotColor(participant.color)">
         </div>
-        <div class="participant-box d-flex align-center">
+        <div 
+          @click="disableDots(i + 5)"
+          class="participant-box d-flex align-center">
           <img :src="participant.championIcon" alt="" class="participant-box-icon">
           {{participant.summonerName}}
         </div>

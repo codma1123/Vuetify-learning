@@ -235,18 +235,22 @@
     <match-team-analysis-gold-kill 
       :match="match" 
       :timelineProps="timelineProps"
-      :timeLineKillsProps="timeLineKillsProps"      
-    />
-    
+      :timeLineKillsProps="timeLineKillsProps"/>    
   </v-sheet>
 
   <v-sheet color="#282830" v-if="selectedMenu === '킬 맵'">
     <match-team-analysis-kill-map 
       :match="match"
-      :killMapProps="killMapProps"
-    />
+      :killMapProps="killMapProps"/>    
   </v-sheet>
 
+  <v-sheet color="#282830" v-if="selectedMenu === '킬 맵'">
+    <match-team-analysis-kill-map 
+      :match="match"
+      :killMapProps="killMapProps"/>
+  </v-sheet>
+
+  
 </template>
 
 <script>

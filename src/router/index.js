@@ -25,7 +25,6 @@ const routes = [
     path: "/summoner/:name",    
     component: () => import('../views/SummonerView.vue'),    
     beforeEnter: (to, from, next) => {
-      console.log('enter..')
       next()
     },    
     children: [

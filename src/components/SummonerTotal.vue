@@ -44,7 +44,6 @@ export default {
     onMounted(() => {
       setTimeout(() => {
         if(!searchStore.tryLoad) {
-          console.log('f5..?')
           searchStore.searchContent(route.params.name)
         }
       })
