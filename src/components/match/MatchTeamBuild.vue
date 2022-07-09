@@ -28,7 +28,15 @@
   <div class="build-divider"></div>
 
   <v-sheet class="d-flex align-center flex-wrap" color="subcontent pl-4">
+    <div v-for="(spell, i) in skillMasterSequence" :key="i">
+      {{spell}}
+    </div>
+  </v-sheet>
 
+  <v-sheet class="d-flex align-center flex-wrap" color="subcontent pl-4">
+    <div v-for="(spell, i) in skillSequence" :key="i">
+      {{spell}}
+    </div>    
   </v-sheet>
 
 
@@ -50,8 +58,6 @@ export default {
     const skillSequence = ref([])
     const skillMasterSequence = ref([])
 
-
-
     const skillEnum = {
       '1': 'Q',
       '2': 'W',
@@ -68,7 +74,7 @@ export default {
 
       skillSequence.value = ownerSkillTimeLine.map(skill => skillEnum[skill])
       
-      const result = ownerSkillTimeLine.map(skill => skillEnum[skill])
+      const result = ownerSkillTimeLine.map(skill => skill)
                           .reduce((acc, cur) => {
                             acc[cur] = acc[cur] + 1
                             if(acc[cur] === 5) {
@@ -76,18 +82,17 @@ export default {
                               delete acc[cur]
                             }
                             return acc
-                          }, {Q: 0, W: 0, E: 0, R: 0})
-      delete result.R
-      const k = skillMasterSequence.value.concat(Object.keys(result))            
-                                                      
-      console.log(result)
-      console.log(skillSequence.value, k)
-
-          
+                          }, {'1': 0, '2': 0, '3': 0, '4': 0})
+      delete result['4']
+      skillMasterSequence.value = skillMasterSequence.value.concat(Object.keys(result.sort()))            
+                                                                
     })
 
     return {
-      itemIcons
+      itemIcons,
+      skillMasterSequence,
+      skillSequence
+
     }
   }
 }
