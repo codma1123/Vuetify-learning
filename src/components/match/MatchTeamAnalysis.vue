@@ -366,7 +366,7 @@ export default {
     
 
     onMounted(async () => {      
-      props.match.gameMode === 'ARAM' ? btnMenus.value.splice(1, 1) : null    
+      props.match.gameMode === 'ARAM' ? btnMenus.value.splice(2, 1) : null    
       const { timelines, timeLineKills, killMap } = await searchStore.searchContentTimeLine(props.match)
       timelineProps.value = timelines
       timeLineKillsProps.value = timeLineKills

@@ -4,7 +4,7 @@ import funcs from '../tools/funcs.js'
 import axios from 'axios'
 import { log } from 'mathjs'
 
-const API_KEY = 'RGAPI-da7c14a4-9e7f-4583-afb8-fcd9bb3bdd7f'
+const API_KEY = 'RGAPI-c2a7f132-a60c-4b6a-9f46-89d6f2af28a4'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
@@ -260,21 +260,36 @@ export const useSearchStore = defineStore('search', {
   
         const res = await axios.get(`${urlConfig.asiaUrl}/lol/match/v5/matches/${match.matchId}/timeline?api_key=${API_KEY}`)
 
-        const ownerTimeLine = []
+        const ownerItemTimeLine = []
+        const ownerSkillTimeLine = []
         const ownerId = match.owner.participantId
         
-        res.data.info.frames.forEach(frame => {
-          ownerTimeLine.push({
+        res.data.info.frames.forEach(frame => {          
+          ownerItemTimeLine.push({
             timestamp: funcs.convertTimestampToMin(frame.timestamp),
             items: frame.events.filter(event => event.participantId === ownerId)
-                                .filter(event => (event.type === 'ITEM_DESTROYED') || (event.type === 'ITEM_PURCHASED'))
+                                .filter(event => event.type === 'ITEM_PURCHASED')
                                   .map(event => ({timestamp: funcs.convertTimestampToMin(event.timestamp), itemId: event.itemId, type: event.type}))
           })
+
+          ownerSkillTimeLine.push(
+            frame.events.filter(event => event.participantId === ownerId)
+                          .filter(event => event.type === 'SKILL_LEVEL_UP')
+                            .filter(event => event.levelUpType === 'NORMAL')         
+                              .map(event => event.skillSlot)                                                                       
+          )                            
         })
-
+              
         this.buildLoading = false
+        console.log(ownerItemTimeLine)
 
-        return ownerTimeLine
+        return {
+          ownerItemTimeLine: ownerItemTimeLine.filter(event => event.items.length !== 0).map(event => ({
+            timestamp: event.timestamp,
+            itemUrls: event.items.map(item => funcs.createItemIconUrl(urlConfig.imgUrl, this.iconCdnVersion, item.itemId))                                
+          })),
+          ownerSkillTimeLine: ownerSkillTimeLine.filter(event => event.length !== 0).flat()
+        }
   
       } catch (e){
         console.log(e)

@@ -1,3 +1,6 @@
+import axios from "axios";
+
+
 function convertHMS(value) {
   const sec = parseInt(value, 10); // convert value to number if it's string
   let hours   = Math.floor(sec / 3600); // get hours
@@ -70,6 +73,14 @@ function createItemIconUrl (url, cdn, id) {
   return `${url}/${cdn}/img/item/${id}.png`
 }
 
+async function createSpellIconUrl (url, cdn, championName) {  
+  const reqUrl = `${url}/${cdn}/data/ko_KR/champion/${championName}.json`
+  const res = await axios.get(reqUrl)
+  const championData = res.data.data
+
+  return championData[championName].spells.map(spell => `${url}/${cdn}/img/spell/${spell.id}.png`)
+}
+
 function convertTimestampToMin(timestamp) {
   return (timestamp / 60000).toFixed()
 }
@@ -82,7 +93,9 @@ export default {
   meanArray,
   swapArray10,
   createRandomColor,
+
   createChampionIconUrl,
   createItemIconUrl,
+  createSpellIconUrl,
   convertTimestampToMin
 }
