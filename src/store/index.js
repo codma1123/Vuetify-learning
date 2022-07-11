@@ -4,7 +4,7 @@ import funcs from '../tools/funcs.js'
 import axios from 'axios'
 import { log } from 'mathjs'
 
-const API_KEY = 'RGAPI-c2a7f132-a60c-4b6a-9f46-89d6f2af28a4'
+const API_KEY = 'RGAPI-1b9f3a3a-77df-4fd7-b678-c7541f018853'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
@@ -147,7 +147,6 @@ export const useSearchStore = defineStore('search', {
     async setupUserIconCDN() {
       const res = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json')
       this.iconCdnVersion = res.data[0]      
-      console.log(this.iconCdnVersion = res.data[0])     
     },
 
     async searchContentTimeLine(match) {
@@ -281,20 +280,39 @@ export const useSearchStore = defineStore('search', {
         })
               
         this.buildLoading = false
-        console.log(ownerItemTimeLine)
-
+        
         return {
           ownerItemTimeLine: ownerItemTimeLine.filter(event => event.items.length !== 0).map(event => ({
             timestamp: event.timestamp,
             itemUrls: event.items.map(item => funcs.createItemIconUrl(urlConfig.imgUrl, this.iconCdnVersion, item.itemId))                                
           })),
-          ownerSkillTimeLine: ownerSkillTimeLine.filter(event => event.length !== 0).flat()
+          ownerSkillTimeLine: ownerSkillTimeLine.filter(event => event.length !== 0).flat(),
+
         }
   
       } catch (e){
         console.log(e)
       }
-    },
+    },    
+
+    async getRuneJson () {
+      try {
+        // https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perks.json 
+        // rune info US
+
+        // https://ddragon.leagueoflegends.com/cdn/10.6.1/data/ko_KR/runesReforged.json
+        // run info KR
+
+        console.log(`${urlConfig.imgUrl}/${this.iconCdnVersion}/data/ko_KR/runesReforged.json`)
+        const res = await axios.get(`${urlConfig.imgUrl}/${this.iconCdnVersion}/data/ko_KR/runesReforged.json`)
+
+        return res.data
+
+
+      } catch (e) {
+        console.log(e)
+      }
+    }
 
   },
 
