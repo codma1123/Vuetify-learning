@@ -11,10 +11,11 @@
       <v-row justify="start">
         <v-col>
           <summoner-total-tier title="솔로랭크"/>      
-          <summoner-total-tier-champions />
+          <summoner-total-tier-champions />      
+          <summoner-total-recent-duo />   
         </v-col>
         <v-col> 
-          <summoner-total-matches />
+          <summoner-total-matches />          
         </v-col>
       </v-row>
     </v-sheet>
@@ -28,6 +29,7 @@ import useSizeSetup from '@/tools/SizeSetup.vue'
 import SummonerTotalTier from './SummonerTotalTier.vue'
 import SummonerTotalTierChampions from './SummonerTotalTierChampions.vue'
 import SummonerTotalMatches from './SummonerTotalMatches.vue'
+import SummonerTotalRecentDuo from './SummonerTotalRecentDuo.vue'
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -35,7 +37,8 @@ export default {
   components: {
     SummonerTotalTier,
     SummonerTotalTierChampions,
-    SummonerTotalMatches
+    SummonerTotalMatches,
+    SummonerTotalRecentDuo
   },
   setup() {
     const { contentSize, searchStore } = useSizeSetup()

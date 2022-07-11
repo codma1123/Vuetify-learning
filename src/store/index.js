@@ -77,10 +77,11 @@ export const useSearchStore = defineStore('search', {
       const count = REQUEST_COUNT
       const matchListRes = await axios.get(`${urlConfig.asiaUrl}/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}&api_key=${API_KEY}`)      
       const matchIdUrls = matchListRes.data.map(matchId => `${urlConfig.asiaUrl}/lol/match/v5/matches/${matchId}?api_key=${API_KEY}`)
-      
+      const recentTeams = []
+            
       await axios.all(matchIdUrls.map(match => axios.get(match))).then(reses => {
-        this.matches = reses.map((res, i) => {
-          const { gameMode, participants, gameDuration, gameEndTimestamp, teams, queueId } = res.data.info  
+        this.matches = reses.map((match, i) => {
+          const { gameMode, participants, gameDuration, gameEndTimestamp, teams, queueId } = match.data.info  
           
           // insert items url object key
           participants.forEach(participant => {
@@ -89,9 +90,17 @@ export const useSearchStore = defineStore('search', {
           })
 
           // owner
-          const owner = participants.find(participant => participant.summonerName === name)                    
+          const owner = participants.find(participant => participant.summonerName === name)   
           const totalKills = teams.find(team => team.teamId == owner.teamId).objectives.champion.kills
-                                                          
+
+          console.log(participants)
+
+          
+          recentTeams.push(...participants.filter(participant => participant.teamId === owner.teamId)
+                                            .map(participant => ({
+                                              name: participant.summonerName,            
+                                              win: participant.win
+                                            })))                                                                                                                                                                
           return { 
             gameMode,
             gameDuration,  
@@ -104,7 +113,22 @@ export const useSearchStore = defineStore('search', {
             matchId: matchListRes.data[i]
           }
         })
+        const cv = {}
+        recentTeams.forEach(participant => cv[participant.name] = {win: 0, lose: 0, total: 0})
+        recentTeams.forEach(participant => {
+          participant.win ? cv[participant.name].win++
+                          : cv[participant.name].lose++
+          cv[participant.name].total++          
+        })
+        const recent5 = Object.entries(cv).sort((a, b) => b[1].total - a[1].total).slice(1, 6)
+        console.log(recent5)
+        
+
+
       })
+
+      
+      
 
       this.user = { 
         summonerLevel,
