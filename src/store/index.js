@@ -2,9 +2,8 @@ import { defineStore } from 'pinia'
 import { urlConfig } from '../tools/divice.js'
 import funcs from '../tools/funcs.js'
 import axios from 'axios'
-import { log } from 'mathjs'
 
-const API_KEY = 'RGAPI-1b9f3a3a-77df-4fd7-b678-c7541f018853'
+const API_KEY = 'RGAPI-5ea9c7d2-7925-42b7-8b6a-e282586c50c8'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
@@ -93,7 +92,7 @@ export const useSearchStore = defineStore('search', {
           const owner = participants.find(participant => participant.summonerName === name)   
           const totalKills = teams.find(team => team.teamId == owner.teamId).objectives.champion.kills
 
-          console.log(participants)
+          
 
           
           recentTeams.push(...participants.filter(participant => participant.teamId === owner.teamId)
@@ -121,10 +120,7 @@ export const useSearchStore = defineStore('search', {
           cv[participant.name].total++          
         })
         const recent5 = Object.entries(cv).sort((a, b) => b[1].total - a[1].total).slice(1, 6)
-        console.log(recent5)
-        
-
-
+            
       })
 
       
@@ -171,6 +167,7 @@ export const useSearchStore = defineStore('search', {
     async setupUserIconCDN() {
       const res = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json')
       this.iconCdnVersion = res.data[0]      
+      console.log(res.data[0])
     },
 
     async searchContentTimeLine(match) {

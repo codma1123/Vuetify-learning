@@ -798,6 +798,7 @@ export default {
       
       const championData = Object.values(championJSON.data)            
       const ids = entries.map(participant => participant.championId)      
+      console.log
       const championImageName = ids.map(id => championData.find(champ => champ.key == id)).map(result => result.image.full)
       const opScores = createOpScores(entries)
 
