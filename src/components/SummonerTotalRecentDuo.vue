@@ -35,7 +35,10 @@
         <v-col cols="12" xl="1" lg="1"> <img :src="getProfileIconUrl(team[1].icon)" alt="" class="recent-team-row-icon"> </v-col>
         <!-- <img :src="getProfileIconUrl(team[1].icon)" alt="" class="recent-team-row-icon"> -->
         <v-col cols="12" xl="4" lg="4" class="row-title">
-          <span class="recent-team-row-title"> {{ team[0]}} </span>  
+          <span 
+            @click="pushEntry(team[0])"
+            class="recent-team-row-title"
+          > {{ team[0] }} </span>  
         </v-col>
         <v-col cols="12" xl="2" lg="2"> {{ team[1].total }} </v-col>
         <v-col cols="12" xl="3" lg="3"> {{ team[1].win }} - {{ team[1].lose }} </v-col>
@@ -49,6 +52,7 @@
 import useSizeSetup from '../tools/SizeSetup.vue'
 import RecentDuoContents from './recentDuo/RecentDuoContents.vue'
 import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 export default {
   components: {
@@ -56,6 +60,7 @@ export default {
   },
   setup() {
     const { searchStore, urlConfig } = useSizeSetup()
+    const router = useRouter()
 
     
     const getWinRate = (win, lose) => ((win / (win + lose)) * 100).toFixed() + '%'
@@ -66,16 +71,18 @@ export default {
 
     const getProfileIconUrl = profileIconId => `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/profileicon/${profileIconId}.png`    
     
-    onMounted(() => {
-                  
-    })
+    function pushEntry(payload) {
+      router.push(`/summoner/${payload}`)
+      searchStore.searchContent(payload)
+    }
 
     return {
       searchStore,
 
       getWinRate,
       getTeamContentStyle,
-      getProfileIconUrl
+      getProfileIconUrl,
+      pushEntry
     }
   }
 }
