@@ -36,6 +36,7 @@ export const useSearchStore = defineStore('search', {
     timeLineValues: [],
     timeLineKills: [],
     killMap: [],
+    recentTeams: [],
     timeLineLoadedFlag: false,
 
     buildLoading: false
@@ -92,14 +93,13 @@ export const useSearchStore = defineStore('search', {
           const owner = participants.find(participant => participant.summonerName === name)   
           const totalKills = teams.find(team => team.teamId == owner.teamId).objectives.champion.kills
 
-          
-
-          
           recentTeams.push(...participants.filter(participant => participant.teamId === owner.teamId)
                                             .map(participant => ({
-                                              name: participant.summonerName,            
+                                              name: participant.summonerName,  
+                                              icon: participant.profileIcon,          
                                               win: participant.win
-                                            })))                                                                                                                                                                
+                                            })))              
+                                                      
           return { 
             gameMode,
             gameDuration,  
@@ -113,18 +113,16 @@ export const useSearchStore = defineStore('search', {
           }
         })
         const cv = {}
-        recentTeams.forEach(participant => cv[participant.name] = {win: 0, lose: 0, total: 0})
+        recentTeams.forEach(participant => cv[participant.name] = {win: 0, lose: 0, total: 0, icon: participant.icon})
         recentTeams.forEach(participant => {
           participant.win ? cv[participant.name].win++
                           : cv[participant.name].lose++
           cv[participant.name].total++          
-        })
-        const recent5 = Object.entries(cv).sort((a, b) => b[1].total - a[1].total).slice(1, 6)
-            
+        })        
+        
+        this.recentTeams = Object.entries(cv).sort((a, b) => b[1].total - a[1].total).slice(1, 6)
+                    
       })
-
-      
-      
 
       this.user = { 
         summonerLevel,
