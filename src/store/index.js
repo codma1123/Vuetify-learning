@@ -3,7 +3,7 @@ import { urlConfig } from '../tools/divice.js'
 import funcs from '../tools/funcs.js'
 import axios from 'axios'
 
-const API_KEY = 'RGAPI-5ea9c7d2-7925-42b7-8b6a-e282586c50c8'
+const API_KEY = 'RGAPI-af7930ee-9242-453a-b316-fca2f277df11'
 
 const API_KEYS = [
   'RGAPI-89d95ffc-7023-4b2f-be2b-8083b8bbdfd1',
@@ -191,7 +191,7 @@ export const useSearchStore = defineStore('search', {
             },   
           }                         
         })
-
+                
         const killTimelines = res.data.info.frames.map(frame => {
           const killEvent = frame.events.filter(event => event.type === 'CHAMPION_KILL')         
           const timeLine = (frame.timestamp / 60000).toFixed()
@@ -221,14 +221,16 @@ export const useSearchStore = defineStore('search', {
 
         
         const championById = [...Array.from({length: 10}).map((_, i) => i + 1)].reduce((acc, cur, i) => {
-          const { summonerName, championName } = match.participants.find(participant => participant.participantId == cur)
+          const { summonerName, championName, participantId } = match.participants.find(participant => participant.participantId == cur)
           acc[cur] = { 
             summonerName,
             championName,
+            participantId,
             position: []
           }
           return acc
         }, {})
+        
         
         killTimelines.forEach(timeline => {
           if(timeline.killPosition.length) {
@@ -262,10 +264,12 @@ export const useSearchStore = defineStore('search', {
 
         this.timeLineLoaded = false
         this.timeLineLoadedFlag = true
+
         return {
           timelines,
           timeLineKills,
-          killMap
+          killMap,          
+          frames: res.data.info.frames
         }
       } catch (e){
         console.log(e)

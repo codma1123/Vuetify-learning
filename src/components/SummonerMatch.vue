@@ -454,7 +454,7 @@
 
     <div v-if="viewSelectToggleButtons[3].activate">
       <v-sheet>
-        etc
+        <match-team-etc :match="match" />
       </v-sheet>
     </div>
     
@@ -472,6 +472,7 @@ import championJSON from '@/assets/championInfo.json'
 import KillChip from '../components/KillChip.vue'
 import MatchTeamAnalysis from '@/components/match/MatchTeamAnalysis.vue'
 import MatchTeamBuild from '@/components/match/MatchTeamBuild.vue'
+import MatchTeamEtc from '@/components//match/MatchTeamEtc.vue'
 import { useRoute, useRouter } from 'vue-router'
 import moment from 'moment'
 
@@ -482,7 +483,8 @@ export default {
   components: {
     KillChip,
     MatchTeamAnalysis,
-    MatchTeamBuild
+    MatchTeamBuild,
+    MatchTeamEtc
   },
   setup(props) {
 
