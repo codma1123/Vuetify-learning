@@ -673,19 +673,20 @@ export default {
     })
 
     const totalKills = computed(() => {
-      const { firstTeam, secondTeam } = findTeam()
+      const firstTeam = props.match.teams.find(team => team.win === props.match.owner.win)
+      const secondTeam = props.match.teams.find(team => team.win !== props.match.owner.win)
       return {
         firstTeamTotalKill: firstTeam.objectives.champion.kills,
         secondTeamTotalKill: secondTeam.objectives.champion.kills
       }
     })
-
+  
     const totalGolds = computed(() => {
       const [one, two] = orderedMatchEntries.value[0]
 
       return {
-        firstTeamGoldEarned: one.map(participant => participant.goldEarned).reduce((acc, cur, i) => acc + cur),
-        secondTeamGoldEarned: two.map(participant => participant.goldEarned).reduce((acc, cur, i) => acc + cur)
+        firstTeamGoldEarned: one.map(participant => participant.goldEarned).reduce((acc, cur) => acc + cur),
+        secondTeamGoldEarned: two.map(participant => participant.goldEarned).reduce((acc, cur) => acc + cur)
       }
     })
     
@@ -743,13 +744,9 @@ export default {
           'height': '16px'
         }        
       ]
-
     })
 
-    const findTeam = () => ({
-      firstTeam: props.match.teams.find(team => team.win === props.match.owner.win),
-      secondTeam: props.match.teams.find(team => team.win !== props.match.owner.win)
-    })
+    
 
     // entry
     const matchEntries = computed(() =>  createMatchEntries(props.match.participants))
@@ -798,11 +795,11 @@ export default {
     
     function createMatchEntries(entries) {
       
-      const championData = Object.values(championJSON.data)            
-      const ids = entries.map(participant => participant.championId)      
-      console.log
-      const championImageName = ids.map(id => championData.find(champ => champ.key == id)).map(result => result.image.full)
+      const championData = Object.values(championJSON.data)                  
       const opScores = createOpScores(entries)
+      const championImageName = entries.map(participant => participant.championId)
+                                          .map(id => championData.find(champ => champ.key == id))
+                                            .map(result => result.image.full)
 
       const stringRankWithOpScores = opScores.map(score => {
         const rule = pr.select(score.rank)
@@ -813,19 +810,22 @@ export default {
       const damageCanvasWidth =  caculateDamageCanvasWidth(entries.map(entry => entry.totalDamageDealtToChampions))
       const damagedCanvasWidth = caculateDamageCanvasWidth(entries.map(entry => entry.totalDamageTaken))
       
-      return entries.map((participant, i) => {
-        const {summonerName, kills, deaths, assists, totalDamageDealtToChampions, totalDamageTaken, visionWardsBoughtInGame, 
-          wardsKilled, wardsPlaced, totalMinionsKilled, champLevel, goldEarned } = participant          
-              
-        return {
-          summonerName, kills, deaths, assists, totalDamageDealtToChampions, totalDamageTaken, visionWardsBoughtInGame, 
-          wardsKilled, wardsPlaced, totalMinionsKilled, champLevel, goldEarned,
+      return entries.map((participant, i) => ({                               
+          summonerName: participant.summonerName,
+          kills: participant.kills,
+          assists: participant.assists,
+          deaths: participant.deaths,
+          totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
+          totalDamageTaken: participant.totalDamageTaken,
+          visionWardsBoughtInGame: participant.visionWardsBoughtInGame,
+          wardsKilled: participant.wardsKilled,
+          wardsPlaced: participant.wardsPlaced,
+          totalMinionsKilled: participant.totalMinionsKilled,
+          champLevel: participant.champLevel,
+          goldEarned: participant.goldEarned,           
           ranking: stringRankWithOpScores[i],
           opScore: opScores[i].score,
-          spellIconUrls: createSpellUrls({
-            summoner1Id: participant.summoner1Id,
-            summoner2Id: participant.summoner2Id        
-          }),
+          spellIconUrls: createSpellUrls({ summoner1Id: participant.summoner1Id, summoner2Id: participant.summoner2Id }),
           score: createScore(participant),
           runeIconUrls: createRuneUrls(participant.perks),
           killInvolvementArea: createkillInvolvementArea(participant),
@@ -834,8 +834,7 @@ export default {
           damageWidth: damageCanvasWidth[i],
           damagedWidth: damagedCanvasWidth[i],
           url: `${urlConfig.imgUrl}/${searchStore.iconCdnVersion}/img/champion/${championImageName[i]}`,          
-        }
-      })
+      }))
     }
 
     function createSpellUrls(player) {
